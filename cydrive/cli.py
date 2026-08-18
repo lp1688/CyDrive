@@ -1,0 +1,199 @@
+import sys
+import os
+import time
+import asyncio
+import threading
+import argparse
+
+if sys.platform.startswith("win"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+try:
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.table import Table
+    from rich.text import Text
+    from rich import print as rprint
+    HAS_RICH = True
+except ImportError:
+    HAS_RICH = False
+
+from cydrive.config import CyDriveConfig
+from cydrive.database import MetaDatabase
+from cydrive.cache_manager import CacheManager
+from cydrive.telegram_client import TelegramSyncEngine
+from cydrive.watcher import DriveWatcher
+from cydrive.webdav_server import CyWebDAVServer
+from cydrive.web_ui.app import CyWebDashboard
+from cydrive.platform.windows import WindowsMounter
+
+class CyDriveCLI:
+    """CLI and Unified Application Runner for CyDrive."""
+
+    def __init__(self):
+        self.console = Console() if HAS_RICH else None
+
+    def print_banner(self):
+        banner_text = r"""
+   ______      ____       _           
+  / ____/_  __/ __ \_____(_)   _____  
+ / /   / / / / / / / ___/ / | / / _ \ 
+/ /___/ /_/ / /_/ / /  / /| |/ /  __/ 
+\____/\__, /_____/_/  /_/ |___/\___/  
+     /____/  CYNET CLOUD STORAGE ENGINE v2.0
+        """
+        if HAS_RICH:
+            self.console.print(Panel(
+                Text(banner_text, style="bold cyan") + 
+                Text("\n🚀 Infinite Cloud Virtual Drive for Windows via Telegram\n🌐 Cynet Security Team • https://cynetx.ir", style="bold magenta"),
+                border_style="cyan"
+            ))
+        else:
+            print("=" * 65)
+            print("  🚀 CyDrive: Infinite Cloud Virtual Drive v2.0")
+            print("  🌐 Cynet Security Team - https://cynetx.ir")
+            print("=" * 65)
+
+    def print_status_table(self, config: CyDriveConfig, db: MetaDatabase):
+        stats = db.get_stats()
+        size_mb = stats["total_bytes"] / (1024 * 1024)
+
+        if HAS_RICH:
+            table = Table(title="💎 CyDrive Active Services & Status", border_style="bright_blue")
+            table.add_column("Service / Component", style="cyan", no_wrap=True)
+            table.add_column("Status / Address", style="green")
+            table.add_column("Details", style="yellow")
+
+            table.add_row("Telegram MTProto", "🟢 Connected", f"Target Chat: {config.chat_id}")
+            table.add_row("WebDAV File Server", "🟢 Active", f"http://{config.webdav_host}:{config.webdav_port}")
+            table.add_row("Cyberpunk Web UI", "🟢 Online", f"http://{config.web_ui_host}:{config.web_ui_port}")
+            table.add_row("Windows Virtual Drive", "🔵 Mapped", f"Drive Letter: {config.drive_letter}")
+            table.add_row("Real-time Watcher", "🟢 Monitoring", f"{config.storage_path}")
+            table.add_row("Cloud Storage Used", "🟣 Synced", f"{stats['total_files']} Files ({size_mb:.2f} MB)")
+
+            self.console.print(table)
+        else:
+            print(f"[+] WebDAV Server: http://{config.webdav_host}:{config.webdav_port}")
+            print(f"[+] Web UI: http://{config.web_ui_host}:{config.web_ui_port}")
+            print(f"[+] Mounted Drive: {config.drive_letter}")
+            print(f"[+] Total Files: {stats['total_files']} ({size_mb:.2f} MB)")
+
+    def run(self):
+        parser = argparse.ArgumentParser(description="CyDrive Cloud Storage Engine")
+        parser.add_argument("command", nargs="?", default="run", choices=["run", "mount", "unmount", "fix-reg", "stats", "setup"], help="Command to execute")
+        args = parser.parse_args()
+
+        self.print_banner()
+
+        if args.command == "setup":
+            CyDriveConfig.interactive_setup()
+            return
+
+        is_run_command = (args.command == "run")
+        config = CyDriveConfig.load(prompt_if_missing=is_run_command)
+        db = MetaDatabase(config.db_path)
+
+        if args.command == "fix-reg":
+            success, msg = WindowsMounter.optimize_webdav_registry()
+            print(f"[{'✅' if success else '❌'}] {msg}")
+            return
+
+        elif args.command == "mount":
+            success, msg = WindowsMounter.mount_drive(config.drive_letter, f"http://{config.webdav_host}:{config.webdav_port}")
+            print(f"[{'✅' if success else '❌'}] {msg}")
+            return
+
+        elif args.command == "unmount":
+            success, msg = WindowsMounter.unmount_drive(config.drive_letter)
+            print(f"[{'✅' if success else '❌'}] {msg}")
+            return
+
+        elif args.command == "stats":
+            stats = db.get_stats()
+            print(f"📊 Storage Stats: {stats}")
+            return
+
+        # Main 'run' workflow
+        print("\n⏳ Initializing CyDrive v2.0 Services...\n")
+        
+        # 1. Start WebDAV server
+        webdav = CyWebDAVServer(config.storage_path, config.webdav_host, config.webdav_port)
+        webdav.start(blocking=False)
+
+        # 2. Start Telegram Sync Client
+        telegram_engine = TelegramSyncEngine(config, db)
+        
+        # Index existing local files
+        for root, dirs, files in os.walk(config.storage_path):
+            for file in files:
+                rel_path = "/" + os.path.relpath(os.path.join(root, file), config.storage_path).replace("\\", "/").lstrip("/")
+                if not db.get_file(rel_path):
+                    db.upsert_file(
+                        rel_path=rel_path,
+                        name=file,
+                        parent_dir="/" + os.path.dirname(rel_path).strip("/"),
+                        size=os.path.getsize(os.path.join(root, file)),
+                        mtime=os.path.getmtime(os.path.join(root, file)),
+                        is_uploaded=True,
+                        is_cached=True
+                    )
+
+        # 3. Start Watcher
+        loop = asyncio.new_event_loop()
+
+        def on_file_ready(file_path, rel_path):
+            print(f"\n📤 [AUTO-SYNC] Uploading {rel_path} to Telegram Cloud...")
+            asyncio.run_coroutine_threadsafe(
+                telegram_engine.upload_file(file_path, rel_path),
+                loop
+            )
+
+        watcher = DriveWatcher(config.storage_path, on_file_ready)
+        watcher.start()
+
+        # 4. Auto-mount Windows Drive
+        if config.auto_mount_drive and WindowsMounter.is_windows():
+            success, msg = WindowsMounter.mount_drive(config.drive_letter, f"http://{config.webdav_host}:{config.webdav_port}")
+            if success:
+                print(f"✅ Auto-Mounted {config.drive_letter} Drive in Windows Explorer")
+
+        # 5. Start Web UI & Telegram Loop
+        def start_async_loop():
+            asyncio.set_event_loop(loop)
+            
+            # Start Telegram
+            loop.run_until_complete(telegram_engine.start())
+            
+            # Start Web Dashboard
+            if config.enable_web_ui:
+                dashboard = CyWebDashboard(config, db)
+                loop.run_until_complete(dashboard.start())
+
+            self.print_status_table(config, db)
+            print("\n✨ CyDrive is running smoothly in background. Press Ctrl+C to stop.\n")
+            loop.run_forever()
+
+        async_thread = threading.Thread(target=start_async_loop, daemon=True)
+        async_thread.start()
+
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            print("\n🛑 Shutting down CyDrive gracefully...")
+            watcher.stop()
+            webdav.stop()
+            if WindowsMounter.is_windows():
+                WindowsMounter.unmount_drive(config.drive_letter)
+            print("👋 Goodbye!")
+
+def main():
+    cli = CyDriveCLI()
+    cli.run()
+
+if __name__ == "__main__":
+    main()

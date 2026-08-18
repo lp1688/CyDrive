@@ -11,9 +11,10 @@ Developed with ❤️ by **[Cynet Security Team](https://cynetx.ir)**
 [![Python Version](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://python.org)
 [![Telegram MTProto](https://img.shields.io/badge/Telegram-MTProto%20(Telethon)-26A5E4?logo=telegram&logoColor=white&style=for-the-badge)](https://telegram.org)
 [![WebDAV](https://img.shields.io/badge/Protocol-WebDAV-FFA500?style=for-the-badge)](https://en.wikipedia.org/wiki/WebDAV)
+[![Web Dashboard](https://img.shields.io/badge/Dashboard-Cyberpunk%20UI-00f3ff?style=for-the-badge)](http://127.0.0.1:8088)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg?style=for-the-badge)](LICENSE)
 
-[English](#-about-cydrive) • [فارسی](#-درباره-cydrive) • [Installation](#-installation--quick-start) • [Map Windows Drive](#-how-to-map-as-a-windows-drive) • [Troubleshooting](#-windows-webdav-size-limit-fix)
+[English](#-about-cydrive) • [فارسی](#-درباره-cydrive) • [Features](#-features) • [Installation](#-installation--quick-start) • [CLI Commands](#-cli-commands) • [Web Dashboard](#-cyberpunk-web-dashboard) • [Troubleshooting](#-windows-webdav-size-limit-fix)
 
 </div>
 
@@ -21,47 +22,67 @@ Developed with ❤️ by **[Cynet Security Team](https://cynetx.ir)**
 
 ## 📖 About CyDrive
 
-**CyDrive** is a two-way synchronization bridge and virtual cloud drive engine. It connects your local Windows environment directly to Telegram's unlimited cloud storage infrastructure and exposes it as a **Native Windows Network Drive (e.g. `Y:` or `Z:`)** using the **WebDAV** protocol.
-
-No complex virtual file system drivers (like Dokany or WinFsp) required! Windows natively connects to CyDrive's WebDAV engine.
+**CyDrive** is a production-grade virtual cloud drive and two-way synchronization bridge. It seamlessly converts Telegram's free, unlimited cloud infrastructure into a **Native Windows Network Drive (e.g. `Y:` or `Z:`)** using **WebDAV**, accompanied by an SQLite Virtual File System (VFS), real-time file event watcher, smart on-demand caching, zero-knowledge encryption, and a built-in modern Cyberpunk Web Dashboard.
 
 ---
 
-## ✨ Features
+## ✨ Features (v2.0 Ecosystem)
 
 - 🔄 **Real-Time Two-Way Sync:**
-  - Files dropped into your local Windows Drive are uploaded instantly to your private Telegram storage.
-  - Files and media sent to your Telegram Bot are automatically downloaded directly to your local drive.
-- 📁 **Native Windows Explorer Drive:** Mount your Telegram storage directly as `Y:` or `Z:` drive in **This PC**.
-- 🚀 **2GB Single File Limit:** Powered by Telethon and Telegram MTProto (bypassing standard HTTP Bot API limitations).
-- 🧩 **Zero Driver Dependencies:** Uses standard HTTP/WebDAV protocol supported out-of-the-box by Windows Explorer.
-- 🔒 **Private & Isolated:** Direct client-to-Telegram communication without third-party middleman servers.
-- ⚙️ **Interactive Setup:** Automatically generates configuration and remembers bot credentials securely.
+  - Files dropped into your Windows Drive (`Y:`) are verified for lock completion and uploaded to Telegram.
+  - Files sent to your Telegram Bot are instantly indexed and synced.
+- 📁 **Native Windows Explorer Drive with Auto-Mount:**
+  - Automatically configures Windows registry and mounts drive `Y:` on launch with zero manual setup.
+- 🌐 **Cyberpunk Web Dashboard (`http://127.0.0.1:8088`):**
+  - Modern dark glassmorphism interface with storage analytics, drag-and-drop uploader, instant search, and built-in video/audio/image streaming media player.
+- 🗄️ **SQLite Hierarchical VFS Engine:**
+  - Full support for nested folders, subdirectories, path preservation, and millisecond queries.
+- 👁️ **Event-Driven File Watcher (`watchdog`):**
+  - Zero high-CPU polling. Debounced event listener with file stability checks (`is_file_ready`) before uploading.
+- 🧩 **Large File Chunking (>2GB Limit Bypass):**
+  - Seamlessly splits massive files into parts and stitches them back on download.
+- 🤖 **Interactive Telegram Remote Bot:**
+  - Remote commands: `/stats`, `/search <query>`, `/get <filename>`, `/help`.
+- 🔐 **Zero-Knowledge AES-256-GCM Encryption (Optional):**
+  - Client-side end-to-end encryption for sensitive data.
 
 ---
 
 ## 🏗️ Architecture
 
 ```mermaid
-flowchart LR
-    subgraph Telegram Cloud
-        TG["Telegram Bot / Private Chat\n(Unlimited Cloud Storage)"]
+graph TD
+    subgraph "Core Engine (cydrive)"
+        VFS["Virtual File System & SQLite Engine<br/>(database.py)"]
+        WATCHER["Real-time Watchdog Event Watcher<br/>(watcher.py)"]
+        CACHE["Smart LRU Cache Manager<br/>(cache_manager.py)"]
+        CHUNKER["Large File Splitter & Chunker<br/>(chunker.py)"]
+        CRYPTO["AES-256-GCM Crypto Engine<br/>(crypto.py)"]
     end
 
-    subgraph CyDrive Engine
-        SYNC["Telethon MTProto Engine\n(Two-Way Async Sync)"]
-        LOCAL["Local Cache\n(./Telegram_Drive)"]
-        WEBDAV["WsgiDAV + Cheroot Server\n(http://127.0.0.1:8080)"]
+    subgraph "Telegram Cloud"
+        MTPROTO["Telethon Fast MTProto Worker<br/>(telegram_client.py)"]
+        BOT["Telegram Remote Bot<br/>(/stats, /search, /get)"]
     end
 
-    subgraph Windows System
-        EXPLORER["Windows File Explorer\n(Network Drive Y:)"]
+    subgraph "User Interfaces"
+        WEBDAV["WebDAV Server (127.0.0.1:8080)<br/>(webdav_server.py)"]
+        WIN_DRIVE["Windows File Explorer (Drive Y:)<br/>(platform/windows.py)"]
+        WEBUI["Cyberpunk Web Dashboard (127.0.0.1:8088)<br/>(web_ui/)"]
+        CLI["Rich Terminal TUI<br/>(cli.py)"]
     end
 
-    TG <-->|MTProto (Up to 2GB)| SYNC
-    SYNC <-->|Auto Sync| LOCAL
-    LOCAL <-->|File Provider| WEBDAV
-    WEBDAV <-->|WebDAV Protocol| EXPLORER
+    WATCHER -->|File Ready| MTPROTO
+    MTPROTO <--> BOT
+    MTPROTO <--> VFS
+    VFS <--> CACHE
+    VFS <--> CHUNKER
+    CHUNKER <--> CRYPTO
+
+    VFS <--> WEBDAV
+    WEBDAV <--> WIN_DRIVE
+    VFS <--> WEBUI
+    VFS <--> CLI
 ```
 
 ---
@@ -69,61 +90,66 @@ flowchart LR
 ## 📦 Installation & Quick Start
 
 ### 1. Prerequisites
-- **Python 3.8+** installed on your system.
-- A Telegram account and a Telegram Bot Token (from [@BotFather](https://t.me/BotFather)).
-- Your Telegram User ID or Chat ID (obtainable from [@userinfobot](https://t.me/userinfobot)).
+- **Python 3.8+** installed.
+- Telegram Bot Token (from [@BotFather](https://t.me/BotFather)) & Chat ID (from [@userinfobot](https://t.me/userinfobot)).
 
-### 2. Clone the Repository
+### 2. Clone & Install
 ```bash
 git clone https://github.com/icynetx/CyDrive.git
 cd CyDrive
-```
-
-### 3. Install Dependencies
-```bash
 pip install -r requirements.txt
 ```
 
-### 4. Run CyDrive
+### 3. Launch CyDrive
 ```bash
-python tgdrive.py
+python main.py
 ```
-> On the first run, the interactive wizard will ask for your **Bot Token** and **Target Chat ID**, then save them in `config.json`.
+> On the first launch, the interactive wizard will ask for your Bot credentials, setup `config.json`, launch WebDAV (`:8080`), start the Web Dashboard (`:8088`), and auto-mount your Windows drive `Y:`.
 
 ---
 
-## 🖥️ How to Map as a Windows Drive
+## 💻 CLI Commands
 
-Once CyDrive is running, map it as a persistent drive in Windows:
+CyDrive comes with a unified command-line tool:
 
-### Method 1: Using Windows Explorer (GUI)
-1. Open **This PC** (File Explorer).
-2. Click the **three dots (`...`)** on the top menu (or right-click *This PC*) and select **Map network drive**.
-3. Choose a Drive Letter (e.g. `Y:` or `Z:`).
-4. In the **Folder** field, enter:
-   ```text
-   http://127.0.0.1:8080
-   ```
-5. Check **Reconnect at sign-in** and click **Finish**.
+| Command | Description |
+|---|---|
+| `python main.py run` | Start all services (WebDAV, Telegram Sync, Web Dashboard, Auto-Mount) |
+| `python main.py mount` | Mount CyDrive as a Windows Network Drive letter |
+| `python main.py unmount` | Safely disconnect the Windows Network Drive |
+| `python main.py fix-reg` | Optimize Windows WebDAV registry (removes 50MB file size limit) |
+| `python main.py stats` | Display storage usage and database metrics |
+| `python main.py setup` | Rerun the interactive credential configuration wizard |
 
-### Method 2: Using Command Prompt / PowerShell
-Run this command in terminal:
-```cmd
-net use Y: http://127.0.0.1:8080 /persistent:yes
+---
+
+## 🌐 Cyberpunk Web Dashboard
+
+Once CyDrive is running, open your browser and navigate to:
+```text
+http://127.0.0.1:8088
 ```
+
+Features included in the Web Dashboard:
+- 📊 Real-time storage gauge and cloud file counts.
+- 📁 Interactive file table with size, status badges, and direct downloads.
+- 🎬 Built-in media streaming modal (video, audio, image viewer).
+- 📤 Drag-and-drop instant upload zone.
+- 🔍 Live search filtering across your entire cloud drive.
 
 ---
 
 ## ⚙️ Windows WebDAV File Size Limit Fix
 
-By default, Windows WebDAV client limits single file transfers to **50 MB**. To allow large files (up to 2GB/4GB), adjust the registry:
-
-### Quick PowerShell Fix (Run as Administrator):
+By default, Windows WebDAV client limits single file transfers to **50 MB**. You can fix this with one command:
+```bash
+python main.py fix-reg
+```
+*(Or run PowerShell as Administrator)*:
 ```powershell
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\WebClient\Parameters" -Name "FileSizeLimitInBytes" -Value 4294967295 -Type DWord
 Restart-Service WebClient
 ```
-*(Or manually navigate in `regedit` to `HKLM\SYSTEM\CurrentControlSet\Services\WebClient\Parameters`, change `FileSizeLimitInBytes` to `ffffffff` Hexadecimal / `4294967295` Decimal, and restart the `WebClient` service).*
 
 ---
 
@@ -131,30 +157,47 @@ Restart-Service WebClient
 
 ```text
 CyDrive/
-├── tgdrive.py              # Main application entry point (Telegram Sync + WebDAV)
-├── requirements.txt        # Python package dependencies
-├── config.example.json     # Configuration template
-├── .gitignore              # Files & directories to ignore in Git
-├── LICENSE                 # MIT License
-└── README.md               # Project documentation
+├── cydrive/
+│   ├── __init__.py
+│   ├── cli.py                  # Rich CLI interface & service coordinator
+│   ├── config.py               # Robust configuration dataclass & loader
+│   ├── database.py             # SQLite VFS metadata manager
+│   ├── crypto.py               # Zero-Knowledge AES-256-GCM encryption
+│   ├── chunker.py              # Large file chunking & reassembly
+│   ├── telegram_client.py      # Telethon MTProto engine & bot commands
+│   ├── watcher.py              # Watchdog real-time file sync watcher
+│   ├── cache_manager.py        # Smart on-demand LRU cache
+│   ├── webdav_server.py        # Custom WebDAV VFS provider
+│   ├── web_ui/                 # Cyberpunk Web Dashboard
+│   │   ├── app.py              # aiohttp Web server
+│   │   ├── static/             # CSS & JS
+│   │   └── templates/index.html# Modern responsive dashboard
+│   └── platform/
+│       └── windows.py          # Auto registry tuner & drive mapper
+├── main.py                     # Primary entrypoint
+├── tgdrive.py                  # Backward-compatible entrypoint
+├── requirements.txt            # Python dependencies
+├── config.example.json         # Config schema
+├── .gitignore                  # Git rules
+├── LICENSE                     # MIT License
+└── README.md                   # Documentation
 ```
 
 ---
 
 ## 🇮🇷 درباره CyDrive (فارسی)
 
-پروژه **CyDrive** یک سیستم درایو ابری نامحدود و امن بر بستر تلگرام برای ویندوز است. با استفاده از این ابزار:
-- فضای چت یا ربات تلگرام شما به صورت مستقیم به یک **درایو تحت شبکه (مانند درایو `Y:`)** در ویندوز اکسپلورر تبدیل می‌شود.
-- انتقال فایل‌ها به صورت دوطرفه (Two-Way) انجام می‌شود؛ یعنی با کشیدن فایل در درایو ویندوز، فایل بلافاصله در تلگرام آپلود می‌شود و هر فایلی که در تلگرام بفرستید درون درایو ویندوز شما دانلود می‌شود.
-- این ابزار بر پایه کلاینت MTProto تلگرام توسعه یافته و از فایل‌های با حجم حداکثر ۲ گیگابایت پشتیبانی می‌کند.
+نسخه ۲ پروژه **CyDrive** یک اکوسیستم کامل ذخیره‌سازی ابری مجازی و بدون محدودیت بر بستر تلگرام است:
+* **درایو بومی ویندوز:** بدون نیاز به نصب درایورهای جانبی، تلگرام به عنوان درایو تحت شبکه `Y:` در ویندوز اکسپلورر متصل می‌شود.
+* **داشبورد وب سایبرپانکی:** پنل کاربری مدرن تحت وب روی پورت `8088` با قابلیت پخش آنلاین ویدیو، صوت و تصاویر، جستجوی آنی و آپلود کشیدنی-رهاکردنی (Drag & Drop).
+* **بهینه‌سازی حداکثری سرعت و منابع:** استفاده از `watchdog` رویدادمحور به جای مصرف مداوم پردازنده، دیتابیس SQLite برای پوشه‌بندی و جلوگیری از کپی ناقص فایل‌های حجیم.
+* **پشتیبانی از فایل‌های سنگین:** امکان تقسیم و آپلود فایل‌های با حجم بالا و رفع خودکار محدودیت‌های رجیستری ویندوز.
 
 ---
 
 ## 🤝 Contributing
 
 Contributions, bug reports, and feature requests are welcome!
-Feel free to open an issue or submit a pull request on GitHub.
-
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)

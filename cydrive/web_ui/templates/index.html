@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyDrive • Infinite Cloud Virtual Drive</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-glow"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-box">
+                    <i class="fa-solid fa-cube"></i>
+                </div>
+                <div class="brand-text">
+                    <h2>CyDrive</h2>
+                    <span>v2.0 • CYNET ENGINE</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active"><i class="fa-solid fa-hard-drive"></i> Cloud Drive</a>
+                <a href="#" class="nav-item" onclick="filterType('media')"><i class="fa-solid fa-photo-film"></i> Media Gallery</a>
+                <a href="#" class="nav-item" onclick="filterType('documents')"><i class="fa-solid fa-file-lines"></i> Documents</a>
+                <a href="https://github.com/icynetx/CyDrive" target="_blank" class="nav-item"><i class="fa-brands fa-github"></i> GitHub</a>
+                <a href="https://cynetx.ir" target="_blank" class="nav-item"><i class="fa-solid fa-shield-halved"></i> Cynet Security</a>
+            </nav>
+
+            <div class="storage-card">
+                <div class="storage-header">
+                    <span>Cloud Storage</span>
+                    <span id="storage-percent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="storage-bar" style="width: 15%;"></div>
+                </div>
+                <p id="storage-detail">0 MB / Unlimited</p>
+                <div class="drive-badge">
+                    <i class="fa-brands fa-windows"></i> Mounted on <strong id="drive-letter">Y:</strong>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="topbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" placeholder="Search files, documents, videos in CyDrive...">
+                </div>
+
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" onclick="document.getElementById('file-upload').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload File
+                    </button>
+                    <input type="file" id="file-upload" style="display: none;" onchange="handleFileUpload(this)">
+                    <button class="btn btn-icon" title="Refresh Drive" onclick="loadDriveData()"><i class="fa-solid fa-rotate"></i></button>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon icon-blue"><i class="fa-solid fa-cloud"></i></div>
+                    <div class="stat-info">
+                        <h3 id="stat-total-files">0</h3>
+                        <p>Total Files Stored</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-purple"><i class="fa-solid fa-database"></i></div>
+                    <div class="stat-info">
+                        <h3 id="stat-total-size">0 MB</h3>
+                        <p>Total Cloud Volume</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-green"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="stat-info">
+                        <h3>Active</h3>
+                        <p>MTProto Telethon Sync</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-cyan"><i class="fa-solid fa-network-wired"></i></div>
+                    <div class="stat-info">
+                        <h3>127.0.0.1:8080</h3>
+                        <p>WebDAV Service</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Drag & Drop Upload Zone -->
+            <section class="drop-zone" id="drop-zone">
+                <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+                <h3>Drag & Drop Files Here</h3>
+                <p>Instantly syncs to your Windows Drive & Telegram Cloud</p>
+            </section>
+
+            <!-- Files Section -->
+            <section class="files-container">
+                <div class="section-title">
+                    <h3><i class="fa-solid fa-folder-open"></i> Cloud Files & Directories</h3>
+                    <span id="file-count-label">0 items</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="files-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Size</th>
+                                <th>Status</th>
+                                <th>Last Modified</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="files-tbody">
+                            <tr>
+                                <td colspan="5" class="loading-state">
+                                    <i class="fa-solid fa-circle-notch fa-spin"></i> Loading CyDrive files...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="media-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h3 id="modal-title">File Preview</h3>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
