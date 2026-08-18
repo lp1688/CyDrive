@@ -1,0 +1,44 @@
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Telethon & Telegram Sessions
+*.session
+*.session-journal
+cynet_bot_session.session*
+
+# Configuration & Secrets
+config.json
+.env
+.env.local
+
+# Local Storage / Mapped Virtual Drive Directory
+Telegram_Drive/
+downloads/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Antigravity / Agents
+.agents/
+.gemini/
