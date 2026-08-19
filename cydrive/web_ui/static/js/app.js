@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loadDriveData();
     setupDropZone();
     setupSearch();
+    // Auto-refresh drive files and stats every 3 seconds
+    setInterval(loadDriveData, 3000);
 });
 
 async function loadDriveData() {
@@ -36,6 +38,11 @@ function updateStatsUI(stats) {
     
     document.getElementById("stat-total-size").innerText = sizeStr;
     document.getElementById("storage-detail").innerText = `${sizeStr} / Unlimited`;
+    
+    if (stats.drive_letter) {
+        const letterEl = document.getElementById("drive-letter");
+        if (letterEl) letterEl.innerText = stats.drive_letter;
+    }
 }
 
 function renderFilesTable(files) {

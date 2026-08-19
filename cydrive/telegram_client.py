@@ -4,6 +4,7 @@ import time
 from typing import Optional, Callable, Dict, Any, List
 from telethon import TelegramClient, events
 from telethon.tl.types import DocumentAttributeFilename, MessageMediaDocument
+from telethon.errors import FloodWaitError, AccessTokenInvalidError, ApiIdInvalidError
 
 from cydrive.config import CyDriveConfig
 from cydrive.database import MetaDatabase
@@ -25,11 +26,18 @@ class TelegramSyncEngine:
 
     async def start(self):
         """Starts the Telethon client with bot token."""
-        await self.client.start(bot_token=self.config.bot_token)
-        self.is_connected = True
-        self._register_handlers()
-        me = await self.client.get_me()
-        print(f"🤖 [Telegram] Logged in as @{me.username} (ID: {me.id})")
+        try:
+            await self.client.start(bot_token=self.config.bot_token)
+            self.is_connected = True
+            self._register_handlers()
+            me = await self.client.get_me()
+            print(f"🤖 [Telegram] Connected as @{me.username} (ID: {me.id})")
+        except AccessTokenInvalidError:
+            print("❌ [Telegram Error] The provided Bot Token is invalid! Run `python main.py setup` to update.")
+        except ApiIdInvalidError:
+            print("❌ [Telegram Error] Invalid Telegram API ID/Hash.")
+        except Exception as e:
+            print(f"⚠️ [Telegram Warning] Could not connect to Telegram MTProto: {e}")
 
     def _register_handlers(self):
         """Registers message handlers and bot commands."""
@@ -147,7 +155,24 @@ class TelegramSyncEngine:
                 caption=caption,
                 progress_callback=progress_callback
             )
+            
+            # Record in SQLite VFS
+            parent = "/" + os.path.dirname(rel_path).strip("/").replace("\\", "/") if os.path.dirname(rel_path).strip("/").replace("\\", "/") else "/"
+            self.db.upsert_file(
+                rel_path=rel_path,
+                name=file_name,
+                parent_dir=parent,
+                size=file_size,
+                mtime=time.time(),
+                telegram_msg_id=msg.id,
+                is_uploaded=True,
+                is_cached=True
+            )
             return msg.id
+        except FloodWaitError as e:
+            print(f"⏳ [Telegram Rate Limit] FloodWait for {e.seconds}s. Auto-waiting...")
+            await asyncio.sleep(e.seconds)
+            return await self.upload_file(local_path, rel_path, progress_callback)
         except Exception as e:
             print(f"❌ [Telegram Upload Error] Failed to upload {file_name}: {e}")
             return None
@@ -159,6 +184,10 @@ class TelegramSyncEngine:
             if msg and msg.media:
                 await msg.download_media(file=dest_path, progress_callback=progress_callback)
                 return True
+        except FloodWaitError as e:
+            print(f"⏳ [Telegram Rate Limit] FloodWait for {e.seconds}s. Auto-waiting...")
+            await asyncio.sleep(e.seconds)
+            return await self.download_file_by_id(msg_id, dest_path, progress_callback)
         except Exception as e:
             print(f"❌ [Telegram Download Error] Failed to download msg {msg_id}: {e}")
         return False

@@ -47,6 +47,14 @@ class CyWebDashboard:
 
     async def get_stats_handler(self, request):
         stats = self.db.get_stats()
+        stats.update({
+            "drive_letter": self.config.drive_letter,
+            "webdav_host": self.config.webdav_host,
+            "webdav_port": self.config.webdav_port,
+            "webdav_url": f"http://{self.config.webdav_host}:{self.config.webdav_port}",
+            "chat_id": self.config.chat_id,
+            "is_configured": bool(self.config.bot_token and self.config.bot_token != "NOT_CONFIGURED")
+        })
         return web.json_response(stats)
 
     async def upload_handler(self, request):

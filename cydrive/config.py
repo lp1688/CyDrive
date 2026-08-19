@@ -58,11 +58,18 @@ class CyDriveConfig:
         print("  🚀 CyDrive: First-Time Interactive Configuration Wizard")
         print("  🌐 Cynet Security Team - https://cynetx.ir")
         print("=" * 65)
-        print("\nPlease provide your Telegram Bot credentials (from @BotFather):")
+        print("\n🔑 Please provide your Telegram Bot credentials:")
         
-        bot_token = input("👉 Enter Telegram Bot Token: ").strip()
-        while not bot_token:
-            bot_token = input("❌ Token cannot be empty. Enter Bot Token: ").strip()
+        bot_token = input("👉 Enter Telegram Bot Token (from @BotFather): ").strip()
+        while not bot_token or ":" not in bot_token:
+            if not bot_token:
+                bot_token = input("❌ Token cannot be empty. Enter Bot Token: ").strip()
+            else:
+                print("⚠️ Warning: Bot tokens usually follow format '123456789:ABCdef...'")
+                confirm = input("👉 Keep this token anyway? (y/n): ").strip().lower()
+                if confirm == "y":
+                    break
+                bot_token = input("👉 Enter Telegram Bot Token: ").strip()
 
         chat_id_input = input("👉 Enter your Telegram User ID / Chat ID (from @userinfobot): ").strip()
         while not chat_id_input:
@@ -73,9 +80,13 @@ class CyDriveConfig:
         except ValueError:
             chat_id = chat_id_input
 
-        drive_letter = input("👉 Choose Windows Drive Letter [default: Y:]: ").strip().upper()
+        # Suggest best available drive letter
+        from cydrive.platform.windows import WindowsMounter
+        best_letter = WindowsMounter.get_best_drive_letter("Y:") if WindowsMounter.is_windows() else "Y:"
+
+        drive_letter = input(f"👉 Choose Windows Drive Letter [default: {best_letter}]: ").strip().upper()
         if not drive_letter:
-            drive_letter = "Y:"
+            drive_letter = best_letter
         if not drive_letter.endswith(":"):
             drive_letter += ":"
 
@@ -85,7 +96,7 @@ class CyDriveConfig:
             drive_letter=drive_letter
         )
         cfg.save(file_path)
-        print(f"\n✅ Configuration saved successfully to {file_path}\n")
+        print(f"\n✅ Configuration successfully saved to {file_path}\n")
         return cfg
 
     def save(self, file_path: str = CONFIG_FILE):
