@@ -118,14 +118,21 @@ class CyDriveCLI:
             return
 
         # Main 'run' workflow
-        print("\n⏳ Initializing CyDrive v2.0 Services...\n")
+        print("\n⏳ Initializing CyDrive v2.0 Pure Virtual Cloud Services...\n")
         
-        # 1. Start WebDAV server
-        webdav = CyWebDAVServer(config.storage_path, config.webdav_host, config.webdav_port)
-        webdav.start(blocking=False)
-
-        # 2. Start Telegram Sync Client
+        cache_mgr = CacheManager(config.cache_path, config.cache_limit_gb)
         telegram_engine = TelegramSyncEngine(config, db)
+
+        # 1. Start Pure Virtual WebDAV server
+        webdav = CyWebDAVServer(
+            root_path=config.storage_path,
+            host=config.webdav_host,
+            port=config.webdav_port,
+            db=db,
+            cache_mgr=cache_mgr,
+            telegram_engine=telegram_engine
+        )
+        webdav.start(blocking=False)
         
         # Index existing local files
         for root, dirs, files in os.walk(config.storage_path):
