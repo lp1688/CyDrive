@@ -14,11 +14,13 @@ from cydrive.cache_manager import CacheManager
 class VirtualTelegramFile(DAVNonCollection):
     """Virtual File Resource mapped directly to Telegram Cloud."""
 
-    def __init__(self, path: str, environ: dict, file_record: dict, cache_mgr: CacheManager, telegram_engine=None):
+    def __init__(self, path: str, environ: dict, file_record: dict, db: MetaDatabase, cache_mgr: CacheManager, telegram_engine=None):
         super().__init__(path, environ)
-        self.file_record = file_record
+        self.file_record = file_record or {}
+        self.db = db
         self.cache_mgr = cache_mgr
         self.telegram_engine = telegram_engine
+        self._write_file_handle = None
 
     def get_content_length(self) -> int:
         return self.file_record.get("size", 0)
@@ -36,12 +38,13 @@ class VirtualTelegramFile(DAVNonCollection):
         return self.file_record.get("mtime", time.time())
 
     def get_etag(self) -> str:
+        # WsgiDAV asserts that get_etag() does NOT contain double quotes
         sha = self.file_record.get("sha256")
         if sha:
-            return f'"{sha}"'
-        mtime = self.file_record.get("mtime", 0)
-        size = self.file_record.get("size", 0)
-        return f'"{mtime}-{size}"'
+            return str(sha).replace('"', '')
+        mtime = int(self.file_record.get("mtime", 0))
+        size = int(self.file_record.get("size", 0))
+        return f"{mtime}-{size}"
 
     def support_etag(self) -> bool:
         return True
@@ -86,7 +89,64 @@ class VirtualTelegramFile(DAVNonCollection):
         rel_path = self.path
         local_cached = self.cache_mgr.get_local_path(rel_path)
         os.makedirs(os.path.dirname(local_cached), exist_ok=True)
-        return open(local_cached, "wb")
+        self._write_file_handle = open(local_cached, "wb")
+        return self._write_file_handle
+
+    def end_write(self, with_errors: bool):
+        """Finalizes writing and triggers background upload to Telegram."""
+        if self._write_file_handle and not self._write_file_handle.closed:
+            try:
+                self._write_file_handle.close()
+            except Exception:
+                pass
+
+        if not with_errors:
+            rel_path = self.path
+            local_cached = self.cache_mgr.get_local_path(rel_path)
+            if os.path.exists(local_cached):
+                file_size = os.path.getsize(local_cached)
+                now = time.time()
+                self.file_record["size"] = file_size
+                self.file_record["mtime"] = now
+                
+                clean_path = "/" + rel_path.strip("/").replace("\\", "/")
+                parent = "/" + os.path.dirname(clean_path).strip("/").replace("\\", "/") if os.path.dirname(clean_path).strip("/").replace("\\", "/") else "/"
+                name = os.path.basename(clean_path)
+                
+                self.db.upsert_file(
+                    rel_path=clean_path,
+                    name=name,
+                    parent_dir=parent,
+                    size=file_size,
+                    mtime=now,
+                    is_dir=False,
+                    is_uploaded=False,
+                    is_cached=True
+                )
+
+                # Trigger upload to Telegram cloud
+                if self.telegram_engine and self.telegram_engine.is_connected:
+                    import asyncio
+                    try:
+                        loop = asyncio.get_event_loop()
+                        asyncio.run_coroutine_threadsafe(
+                            self.telegram_engine.upload_file(local_cached, clean_path),
+                            loop
+                        )
+                    except Exception as e:
+                        print(f"⚠️ [WebDAV Upload Trigger] {e}")
+
+    def handle_delete(self):
+        """Handles file deletion."""
+        rel_path = "/" + self.path.strip("/").replace("\\", "/")
+        self.db.delete_file(rel_path)
+        local_cached = self.cache_mgr.get_local_path(rel_path)
+        if os.path.exists(local_cached):
+            try:
+                os.remove(local_cached)
+            except OSError:
+                pass
+        return True
 
 
 class VirtualTelegramFolder(DAVCollection):
@@ -99,15 +159,12 @@ class VirtualTelegramFolder(DAVCollection):
         self.telegram_engine = telegram_engine
 
     def get_member_names(self) -> List[str]:
-        rel_path = self.path if self.path.startswith("/") else "/" + self.path
+        rel_path = "/" + self.path.strip("/").replace("\\", "/") if self.path.strip("/") else "/"
         items = self.db.list_dir(parent_dir=rel_path)
         return [item["name"] for item in items]
 
     def get_member(self, name: str):
-        rel_path = os.path.join(self.path, name).replace("\\", "/")
-        if not rel_path.startswith("/"):
-            rel_path = "/" + rel_path
-
+        rel_path = "/" + os.path.join(self.path.strip("/"), name).replace("\\", "/")
         item = self.db.get_file(rel_path)
         if not item:
             return None
@@ -115,7 +172,7 @@ class VirtualTelegramFolder(DAVCollection):
         if item["is_dir"]:
             return VirtualTelegramFolder(rel_path, self.environ, self.db, self.cache_mgr, self.telegram_engine)
         else:
-            return VirtualTelegramFile(rel_path, self.environ, item, self.cache_mgr, self.telegram_engine)
+            return VirtualTelegramFile(rel_path, self.environ, item, self.db, self.cache_mgr, self.telegram_engine)
 
     def support_etag(self) -> bool:
         return False
@@ -124,14 +181,13 @@ class VirtualTelegramFolder(DAVCollection):
         return False
 
     def create_empty_resource(self, name: str):
-        rel_path = os.path.join(self.path, name).replace("\\", "/")
-        if not rel_path.startswith("/"):
-            rel_path = "/" + rel_path
+        rel_path = "/" + os.path.join(self.path.strip("/"), name).replace("\\", "/")
+        parent = "/" + self.path.strip("/").replace("\\", "/") if self.path.strip("/") else "/"
 
         self.db.upsert_file(
             rel_path=rel_path,
             name=name,
-            parent_dir=self.path,
+            parent_dir=parent,
             size=0,
             mtime=time.time(),
             is_dir=False,
@@ -139,17 +195,16 @@ class VirtualTelegramFolder(DAVCollection):
             is_cached=True
         )
         item = self.db.get_file(rel_path)
-        return VirtualTelegramFile(rel_path, self.environ, item, self.cache_mgr, self.telegram_engine)
+        return VirtualTelegramFile(rel_path, self.environ, item, self.db, self.cache_mgr, self.telegram_engine)
 
     def create_collection(self, name: str):
-        rel_path = os.path.join(self.path, name).replace("\\", "/")
-        if not rel_path.startswith("/"):
-            rel_path = "/" + rel_path
+        rel_path = "/" + os.path.join(self.path.strip("/"), name).replace("\\", "/")
+        parent = "/" + self.path.strip("/").replace("\\", "/") if self.path.strip("/") else "/"
 
         self.db.upsert_file(
             rel_path=rel_path,
             name=name,
-            parent_dir=self.path,
+            parent_dir=parent,
             size=0,
             mtime=time.time(),
             is_dir=True,
@@ -157,6 +212,11 @@ class VirtualTelegramFolder(DAVCollection):
             is_cached=True
         )
         return VirtualTelegramFolder(rel_path, self.environ, self.db, self.cache_mgr, self.telegram_engine)
+
+    def handle_delete(self):
+        rel_path = "/" + self.path.strip("/").replace("\\", "/")
+        self.db.delete_file(rel_path)
+        return True
 
 
 class PureVirtualTelegramProvider(DAVProvider):
@@ -169,14 +229,14 @@ class PureVirtualTelegramProvider(DAVProvider):
         self.telegram_engine = telegram_engine
 
     def get_resource_inst(self, path: str, environ: dict):
-        clean_path = "/" + path.strip("/") if path.strip("/") else "/"
+        clean_path = "/" + path.strip("/").replace("\\", "/") if path.strip("/") else "/"
         if clean_path == "/":
             return VirtualTelegramFolder("/", environ, self.db, self.cache_mgr, self.telegram_engine)
 
         item = self.db.get_file(clean_path)
         if not item:
-            # Check if parent exists
-            parent = "/" + os.path.dirname(clean_path).strip("/") if os.path.dirname(clean_path).strip("/") else "/"
+            # Check if parent collection exists
+            parent = "/" + os.path.dirname(clean_path).strip("/").replace("\\", "/") if os.path.dirname(clean_path).strip("/").replace("\\", "/") else "/"
             name = os.path.basename(clean_path)
             parent_res = self.db.get_file(parent)
             if parent_res or parent == "/":
@@ -186,7 +246,7 @@ class PureVirtualTelegramProvider(DAVProvider):
         if item["is_dir"]:
             return VirtualTelegramFolder(clean_path, environ, self.db, self.cache_mgr, self.telegram_engine)
         else:
-            return VirtualTelegramFile(clean_path, environ, item, self.cache_mgr, self.telegram_engine)
+            return VirtualTelegramFile(clean_path, environ, item, self.db, self.cache_mgr, self.telegram_engine)
 
 
 class CyWebDAVServer:
