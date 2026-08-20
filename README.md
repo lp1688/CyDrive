@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![CyDrive Banner](https://raw.githubusercontent.com/icynetx/CyDrive/main/assets/banner.png)
+![CyDrive Banner](assets/banner.jpg)
 
 ### **تبدیل تلگرام به هارد دیسک ابری نامحدود و درایو بومی ویندوز**
 *توسعه‌داده‌شده توسط تیم امنیت سایبری ساینت (**[Cynet Security Team](https://cynetx.ir)***)

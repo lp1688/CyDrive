@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![CyDrive Banner](https://raw.githubusercontent.com/icynetx/CyDrive/main/assets/banner.png)
+![CyDrive Banner](assets/banner.jpg)
 
 ### **Turn Telegram into an Infinite, Native Windows Hard Drive & Cyberpunk Cloud**
 *Crafted with precision by the **[Cynet Security Team](https://cynetx.ir)***
