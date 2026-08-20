@@ -296,9 +296,11 @@ class CyWebDAVServer:
 
     def start(self, blocking: bool = False):
         """Starts the WebDAV server."""
+        from cydrive.config import get_display_ip
         app = self._create_app()
         self.server = wsgi.Server(bind_addr=(self.host, self.port), wsgi_app=app)
-        print(f"🌐 [WebDAV] Pure Virtual Cloud Drive running at http://{self.host}:{self.port}")
+        disp_ip = get_display_ip(self.host)
+        print(f"🌐 [WebDAV] Pure Virtual Cloud Drive running at http://{disp_ip}:{self.port}")
         
         if blocking:
             self.server.start()

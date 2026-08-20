@@ -146,4 +146,6 @@ class CyWebDashboard:
         await self.runner.setup()
         self.site = web.TCPSite(self.runner, self.config.web_ui_host, self.config.web_ui_port)
         await self.site.start()
-        print(f"✨ [Web UI] Dashboard active at http://{self.config.web_ui_host}:{self.config.web_ui_port}")
+        from cydrive.config import get_display_ip
+        disp_ip = get_display_ip(self.config.web_ui_host)
+        print(f"✨ [Web UI] Dashboard active at http://{disp_ip}:{self.config.web_ui_port}")

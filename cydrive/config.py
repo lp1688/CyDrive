@@ -12,6 +12,35 @@ DEFAULT_DB_FILE = os.path.abspath("./cydrive_meta.db")
 DEFAULT_API_ID = 6
 DEFAULT_API_HASH = "eb06d4abfb49dc3eeb1aeb98ae0f581e"
 
+def get_display_ip(host: str = "127.0.0.1") -> str:
+    """Returns the user-friendly clickable IP (detects public IP if host is 0.0.0.0)."""
+    if host and host not in ("0.0.0.0", "::"):
+        return host
+
+    import socket
+    import urllib.request
+
+    # 1. Try public IP lookup
+    for service in ["https://api.ipify.org", "https://ifconfig.me/ip", "https://icanhazip.com"]:
+        try:
+            req = urllib.request.Request(service, headers={"User-Agent": "curl/7.68.0"})
+            with urllib.request.urlopen(req, timeout=1.5) as resp:
+                ip = resp.read().decode("utf-8").strip()
+                if ip and len(ip.split(".")) == 4:
+                    return ip
+        except Exception:
+            continue
+
+    # 2. Fallback to primary local network IP
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
+
 @dataclass
 class CyDriveConfig:
     bot_token: str

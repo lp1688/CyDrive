@@ -59,8 +59,11 @@ class CyDriveCLI:
             print("=" * 65)
 
     def print_status_table(self, config: CyDriveConfig, db: MetaDatabase):
+        from cydrive.config import get_display_ip
         stats = db.get_stats()
         size_mb = stats["total_bytes"] / (1024 * 1024)
+        webdav_ip = get_display_ip(config.webdav_host)
+        web_ui_ip = get_display_ip(config.web_ui_host)
 
         if HAS_RICH:
             table = Table(title="💎 CyDrive Active Services & Status", border_style="bright_blue")
@@ -69,16 +72,16 @@ class CyDriveCLI:
             table.add_column("Details", style="yellow")
 
             table.add_row("Telegram MTProto", "🟢 Connected", f"Target Chat: {config.chat_id}")
-            table.add_row("WebDAV File Server", "🟢 Active", f"http://{config.webdav_host}:{config.webdav_port}")
-            table.add_row("Cyberpunk Web UI", "🟢 Online", f"http://{config.web_ui_host}:{config.web_ui_port}")
+            table.add_row("WebDAV File Server", "🟢 Active", f"http://{webdav_ip}:{config.webdav_port}")
+            table.add_row("Cyberpunk Web UI", "🟢 Online", f"http://{web_ui_ip}:{config.web_ui_port}")
             table.add_row("Windows Virtual Drive", "🔵 Mapped", f"Drive Letter: {config.drive_letter}")
             table.add_row("Local Disk Footprint", "🟢 0 Bytes (Pure Cloud)", "Direct on-demand streaming from Telegram")
             table.add_row("Cloud Storage Used", "🟣 Synced", f"{stats['total_files']} Files ({size_mb:.2f} MB)")
 
             self.console.print(table)
         else:
-            print(f"[+] WebDAV Server: http://{config.webdav_host}:{config.webdav_port}")
-            print(f"[+] Web UI: http://{config.web_ui_host}:{config.web_ui_port}")
+            print(f"[+] WebDAV Server: http://{webdav_ip}:{config.webdav_host}")
+            print(f"[+] Web UI: http://{web_ui_ip}:{config.web_ui_port}")
             print(f"[+] Mounted Drive: {config.drive_letter}")
             print(f"[+] Local Disk Footprint: 0 Bytes (Pure Cloud)")
             print(f"[+] Total Files: {stats['total_files']} ({size_mb:.2f} MB)")
