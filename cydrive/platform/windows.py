@@ -2,8 +2,12 @@ import os
 import sys
 import subprocess
 import string
-import winreg
 from typing import Tuple, List
+
+try:
+    import winreg
+except ImportError:
+    winreg = None
 
 class WindowsMounter:
     """Automates Windows WebDAV Registry optimization, Service management and Drive mapping."""
@@ -37,11 +41,12 @@ class WindowsMounter:
         used = []
         try:
             import ctypes
-            bitmask = ctypes.windll.kernel32.GetLogicalDrives()
-            for letter in string.ascii_uppercase:
-                if bitmask & 1:
-                    used.append(f"{letter}:")
-                bitmask >>= 1
+            if hasattr(ctypes, "windll"):
+                bitmask = ctypes.windll.kernel32.GetLogicalDrives()
+                for letter in string.ascii_uppercase:
+                    if bitmask & 1:
+                        used.append(f"{letter}:")
+                    bitmask >>= 1
         except Exception:
             pass
         return used
@@ -49,6 +54,8 @@ class WindowsMounter:
     @classmethod
     def get_best_drive_letter(cls, preferred: str = "Y:") -> str:
         """Finds the best available drive letter."""
+        if not cls.is_windows():
+            return "Y:"
         preferred = preferred.strip().upper()
         if not preferred.endswith(":"):
             preferred += ":"
@@ -66,7 +73,7 @@ class WindowsMounter:
     @classmethod
     def optimize_webdav_registry(cls) -> Tuple[bool, str]:
         """Ensures Windows WebDAV client allows up to 4GB files and HTTP Basic Auth."""
-        if not cls.is_windows():
+        if not cls.is_windows() or winreg is None:
             return False, "Not on Windows."
 
         try:
