@@ -177,7 +177,7 @@ class CyDriveCLI:
             
             # Start Web Dashboard
             if config.enable_web_ui:
-                dashboard = CyWebDashboard(config, db)
+                dashboard = CyWebDashboard(config, db, telegram_engine)
                 loop.run_until_complete(dashboard.start())
 
             self.print_status_table(config, db)

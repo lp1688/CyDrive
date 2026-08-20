@@ -51,37 +51,41 @@ class TelegramSyncEngine:
                 await self._process_bot_command(event)
 
     async def _process_incoming_file(self, event):
-        """Processes and downloads media sent directly into Telegram chat."""
+        """Indexes incoming Telegram media metadata without downloading payload to disk (Pure Virtual Cloud)."""
         msg = event.message
         file_name = None
+        file_size = 0
+        mime_type = None
 
         if hasattr(msg, "file") and msg.file:
             file_name = getattr(msg.file, "name", None)
+            file_size = getattr(msg.file, "size", 0) or 0
+            mime_type = getattr(msg.file, "mime_type", None)
 
         if not file_name:
             ext = getattr(msg.file, "ext", ".bin") if hasattr(msg, "file") else ".bin"
             file_name = f"Telegram_File_{msg.id}{ext}"
 
         rel_path = f"/{file_name}"
-        dest_path = os.path.join(self.config.storage_path, file_name)
         
-        print(f"📥 [SYNC] Incoming Telegram file: {file_name} ...")
-        await msg.download_media(file=dest_path)
+        print(f"☁️ [PURE CLOUD VFS] Indexed Telegram cloud file: {file_name} ({file_size // 1024} KB) - [0 Bytes Local Disk]")
         
-        size = os.path.getsize(dest_path) if os.path.exists(dest_path) else 0
         self.db.upsert_file(
             rel_path=rel_path,
             name=file_name,
             parent_dir="/",
-            size=size,
+            size=file_size,
             mtime=time.time(),
             telegram_msg_id=msg.id,
             is_uploaded=True,
-            is_cached=True
+            is_cached=False,
+            mime_type=mime_type
         )
 
         try:
-            await event.respond(f"💾 File **'{file_name}'** ({size // 1024} KB) synced to CyDrive Drive ({self.config.drive_letter})!")
+            size_mb = file_size / (1024 * 1024)
+            size_str = f"{size_mb / 1024:.2f} GB" if size_mb >= 1024 else f"{size_mb:.2f} MB"
+            await event.respond(f"☁️ File **'{file_name}'** ({size_str}) is now instantly available in your Virtual Drive ({self.config.drive_letter}) without using your local hard drive space!")
         except Exception:
             pass
 

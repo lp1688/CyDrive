@@ -1,5 +1,7 @@
 import os
 import mimetypes
+import tempfile
+from typing import Optional
 
 try:
     from aiohttp import web
@@ -10,11 +12,12 @@ from cydrive.config import CyDriveConfig
 from cydrive.database import MetaDatabase
 
 class CyWebDashboard:
-    """Lightweight aiohttp Web Dashboard for CyDrive."""
+    """Lightweight aiohttp Pure Virtual Web Dashboard for CyDrive."""
 
-    def __init__(self, config: CyDriveConfig, db: MetaDatabase):
+    def __init__(self, config: CyDriveConfig, db: MetaDatabase, telegram_engine=None):
         self.config = config
         self.db = db
+        self.telegram_engine = telegram_engine
         if HAS_AIOHTTP:
             self.app = web.Application()
             self.runner = None
@@ -65,27 +68,74 @@ class CyWebDashboard:
             if not filename:
                 return web.json_response({"error": "No filename"}, status=400)
             
-            dest = os.path.join(self.config.storage_path, filename)
-            with open(dest, "wb") as f:
-                while chunk := await field.read_chunk():
-                    f.write(chunk)
+            # Use temporary file to stream to Telegram without hoarding permanent disk space
+            temp_fd, temp_path = tempfile.mkstemp(prefix="cydrive_up_")
+            try:
+                with open(temp_path, "wb") as f:
+                    while chunk := await field.read_chunk():
+                        f.write(chunk)
+                
+                # Upload directly to Telegram cloud
+                if self.telegram_engine and self.telegram_engine.is_connected:
+                    await self.telegram_engine.upload_file(temp_path, f"/{filename}")
+                else:
+                    # Fallback to local storage if telegram not connected
+                    dest = os.path.join(self.config.storage_path, filename)
+                    os.makedirs(os.path.dirname(dest), exist_ok=True)
+                    import shutil
+                    shutil.copy2(temp_path, dest)
+            finally:
+                os.close(temp_fd)
+                if os.path.exists(temp_path):
+                    try:
+                        os.remove(temp_path)
+                    except OSError:
+                        pass
             
             return web.json_response({"success": True, "filename": filename})
         return web.json_response({"error": "Invalid upload"}, status=400)
 
     async def download_handler(self, request):
         filename = request.match_info.get("filename")
-        file_path = os.path.join(self.config.storage_path, filename)
-        if not os.path.exists(file_path):
-            return web.Response(text="File not found", status=404)
-
-        mime_type, _ = mimetypes.guess_type(file_path)
-        mime_type = mime_type or "application/octet-stream"
+        rel_path = f"/{filename}"
+        file_record = self.db.get_file(rel_path) or self.db.get_file(filename)
         
-        return web.FileResponse(file_path, headers={
-            "Content-Type": mime_type,
-            "Content-Disposition": f'inline; filename="{filename}"'
-        })
+        local_path = os.path.join(self.config.storage_path, filename)
+        
+        # 1. If available in local cache/disk, stream directly
+        if os.path.exists(local_path):
+            mime_type, _ = mimetypes.guess_type(local_path)
+            mime_type = mime_type or "application/octet-stream"
+            return web.FileResponse(local_path, headers={
+                "Content-Type": mime_type,
+                "Content-Disposition": f'inline; filename="{filename}"'
+            })
+
+        # 2. If available on Telegram, stream directly from Telegram cloud on-demand
+        if file_record and file_record.get("telegram_msg_id") and self.telegram_engine and self.telegram_engine.is_connected:
+            msg_id = file_record["telegram_msg_id"]
+            msg = await self.telegram_engine.client.get_messages(self.config.chat_id, ids=msg_id)
+            if msg and msg.media:
+                file_size = file_record.get("size", 0)
+                mime_type = file_record.get("mime_type") or mimetypes.guess_type(filename)[0] or "application/octet-stream"
+                
+                response = web.StreamResponse(
+                    status=200,
+                    reason='OK',
+                    headers={
+                        'Content-Type': mime_type,
+                        'Content-Disposition': f'inline; filename="{filename}"',
+                        'Content-Length': str(file_size)
+                    }
+                )
+                await response.prepare(request)
+                
+                async for chunk in self.telegram_engine.client.iter_download(msg.media):
+                    await response.write(chunk)
+                await response.write_eof()
+                return response
+
+        return web.Response(text="File not found in CyDrive cloud", status=404)
 
     async def start(self):
         if not HAS_AIOHTTP:
