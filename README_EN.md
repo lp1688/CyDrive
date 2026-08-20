@@ -192,10 +192,52 @@ python main.py setup
 
 ---
 
+## 🐧 3 Ways to Use CyDrive on Linux Servers (VPS / Ubuntu / Debian / CentOS)
+
+Linux does not use drive letters (like `Y:`). Instead, CyDrive delivers 3 flexible workflows:
+
+### 1. Cyberpunk Web Dashboard (Easiest for Remote VPS):
+Open your web browser from any desktop or mobile device:
+👉 **`http://YOUR_SERVER_IP:8088`**
+* **Drag & Drop Upload:** Drop files directly into the browser to upload to Telegram cloud.
+* **In-Browser Media Streaming:** Stream videos (MP4/MKV) and music (MP3/FLAC) without full local downloads.
+* **Instant Search & Download:** Search through thousands of cloud files with instant download buttons.
+
+### 2. Local Cloud Directory Mount (`~/CyDrive`):
+Mount Telegram cloud directly into the Linux file hierarchy via `davfs2`:
+```bash
+# Install WebDAV mount driver
+sudo apt install -y davfs2
+
+# Launch CyDrive (auto-mounts ~/CyDrive)
+python3 main.py
+```
+Interact directly using standard Linux terminal commands:
+```bash
+# Copy a database backup straight to Telegram cloud
+cp /var/backups/db.sql.gz ~/CyDrive/
+
+# List cloud files directly
+ls -la ~/CyDrive/
+```
+
+### 3. Rclone & Server Backup Automations:
+Connect the active WebDAV server (`http://YOUR_SERVER_IP:8080`) to **Rclone** for scheduled cron backups:
+```bash
+# Setup rclone WebDAV remote
+rclone config
+# Type: webdav | URL: http://127.0.0.1:8080 | vendor: other
+
+# Sync website or application folder to Telegram:
+rclone sync /var/www/html/ cydrive:/Backup/ -P
+```
+
+---
+
 ## 🌐 Cyberpunk Web Dashboard
 
 When CyDrive is running, open your web browser and visit:
-👉 **`http://127.0.0.1:8088`**
+👉 **`http://127.0.0.1:8088`** (or `http://YOUR_SERVER_IP:8088` on a VPS)
 
 Features included in the Web Dashboard:
 - 📊 **Live Storage Metrics:** Real-time volume gauge and file counters.
