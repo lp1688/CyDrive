@@ -23,6 +23,9 @@ class VirtualTelegramFile(DAVNonCollection):
     def get_content_length(self) -> int:
         return self.file_record.get("size", 0)
 
+    def support_content_length(self) -> bool:
+        return True
+
     def get_content_type(self) -> str:
         return self.file_record.get("mime_type") or "application/octet-stream"
 
@@ -31,6 +34,20 @@ class VirtualTelegramFile(DAVNonCollection):
 
     def get_last_modified(self) -> float:
         return self.file_record.get("mtime", time.time())
+
+    def get_etag(self) -> str:
+        sha = self.file_record.get("sha256")
+        if sha:
+            return f'"{sha}"'
+        mtime = self.file_record.get("mtime", 0)
+        size = self.file_record.get("size", 0)
+        return f'"{mtime}-{size}"'
+
+    def support_etag(self) -> bool:
+        return True
+
+    def support_ranges(self) -> bool:
+        return True
 
     def get_content(self):
         """Streams content on-demand from cache or Telegram cloud."""
@@ -47,7 +64,7 @@ class VirtualTelegramFile(DAVNonCollection):
         if msg_id and self.telegram_engine and self.telegram_engine.is_connected:
             print(f"⚡ [VIRTUAL STREAM] On-demand hydrating {rel_path} from Telegram cloud...")
             self.cache_mgr.evict_lru(self.file_record.get("size", 0))
-            # Download to cache on demand
+            
             import asyncio
             try:
                 loop = asyncio.get_event_loop()
@@ -99,6 +116,12 @@ class VirtualTelegramFolder(DAVCollection):
             return VirtualTelegramFolder(rel_path, self.environ, self.db, self.cache_mgr, self.telegram_engine)
         else:
             return VirtualTelegramFile(rel_path, self.environ, item, self.cache_mgr, self.telegram_engine)
+
+    def support_etag(self) -> bool:
+        return False
+
+    def support_ranges(self) -> bool:
+        return False
 
     def create_empty_resource(self, name: str):
         rel_path = os.path.join(self.path, name).replace("\\", "/")
