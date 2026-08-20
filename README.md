@@ -1,11 +1,11 @@
-# 🚀 CyDrive
+# 🚀 سای‌درایو (CyDrive)
 
 <div align="center">
 
 ![CyDrive Banner](https://raw.githubusercontent.com/icynetx/CyDrive/main/assets/banner.png)
 
-### **Turn Telegram into an Infinite, Native Windows Hard Drive & Cyberpunk Cloud**
-*Crafted with precision by the **[Cynet Security Team](https://cynetx.ir)***
+### **تبدیل تلگرام به هارد دیسک ابری نامحدود و درایو بومی ویندوز**
+*توسعه‌داده‌شده توسط تیم امنیت سایبری ساینت (**[Cynet Security Team](https://cynetx.ir)***)
 
 [![GitHub Stars](https://img.shields.io/github/stars/icynetx/CyDrive?style=for-the-badge&logo=github&color=00f3ff)](https://github.com/icynetx/CyDrive/stargazers)
 [![Python Version](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://python.org)
@@ -14,71 +14,74 @@
 [![Web Dashboard](https://img.shields.io/badge/Dashboard-Cyberpunk%20UI%20(8088)-00f3ff?style=for-the-badge)](http://127.0.0.1:8088)
 [![License: MIT](https://img.shields.io/badge/License-MIT-00ff88.svg?style=for-the-badge)](LICENSE)
 
-[Why CyDrive?](#-why-cydrive) • [Features](#-key-features) • [Quick Start](#-quick-start-in-3-minutes) • [Web Dashboard](#-cyberpunk-web-dashboard) • [How It Works](#-under-the-hood-how-it-works) • [FAQ & Troubleshooting](#-frequently-asked-questions--troubleshooting) • [راهنمای جامع فارسی](#-راهنمای-جامع-فارسی-cydrive)
+[🌐 English Documentation (English Version)](README_EN.md) • [چرا CyDrive؟](#-چرا-cydrive) • [قابلیت‌های کلیدی](#-امکانات-و-قابلیت‌های-برجسته) • [آموزش ۰ تا ۱۰۰ راه‌اندازی](#-آموزش-گام‌به‌گام-۰-تا-۱۰۰-راه‌اندازی) • [داشبورد وب](#-داشبورد-تحت-وب-سایبرپانکی) • [دستورات ترمینال](#-دستورات-خط-فرمان-cli) • [سوالات متداول و عیب‌یابی](#-سوالات-متداول-و-عیب‌یابی-faqs)
 
 </div>
 
 ---
 
-## 💡 Why CyDrive?
+## 💡 چرا CyDrive؟
 
-Let's be honest: **Cloud storage subscriptions are expensive, and free tiers are painfully tiny.**
-Google Drive gives you 15 GB (shared with your emails), Dropbox gives you a measly 2 GB, and OneDrive isn't much better.
+بیایید واقع‌بین باشیم: **اشتراک‌های سرویس‌های ابری خارجی (مثل گوگل‌درایو، دراپ‌باکس و وان‌درایو) بسیار گران هستند و حجم‌های رایگان آن‌ها به شکلی خنده‌دار کم است!**
+گوگل‌درایو فقط ۱۵ گیگابایت فضای اشتراکی با جیمیل می‌دهد، دراپ‌باکس فقط ۲ گیگابایت حجم دارد و برای پلن‌های چند ترابایتی باید ماهانه هزینه‌های سنگین دلاری پرداخت کنید.
 
-Meanwhile, **Telegram provides virtually unlimited, free, and robust cloud storage across its global server infrastructure.** 
-However, using Telegram as a cloud drive has always felt like a clunky hack:
-- Dumping files into "Saved Messages" turns your chat into an unorganized, unsearchable digital attic.
-- There are no nested folders, no subdirectories, and no native file tree.
-- Uploading or downloading files requires manually clicking around in the app.
+در سوی دیگر، **سرورهای قدرتمند تلگرام، فضای ابری نامحدود، پرسرعت، رایگان و فوق‌العاده پایداری را در اختیار کاربران قرار داده‌اند.**
+اما استفاده سنتی از تلگرام به عنوان درایو ابری همیشه یک کابوس خسته‌کننده بود:
+- ریختن فایل‌ها در «پیام‌های ذخیره‌شده (Saved Messages)» چت شما را به یک انبار بی‌نظم، شلوغ و غیرقابل‌جستجو تبدیل می‌کرد.
+- هیچ ساختار پوشه‌بندی درختی (Folder / Subfolder) در تلگرام وجود نداشت.
+- برای هر بار استفاده یا مشاهده فایل‌ها، باید برنامه تلگرام را باز کرده و فایل‌ها را به صورت دستی دانلود و در ویندوز ذخیره می‌کردید.
 
-**CyDrive fixes all of that.** It bridges your private Telegram bot chat directly into **Windows File Explorer** as a real, mounted drive letter (like `Y:`). 
+**پروژه CyDrive این معضل را یک‌بار برای همیشه حل کرده است.** این نرم‌افزار، چت تلگرام شما را مستقیماً به یک **درایو هارد دیسک واقعی در ویندوز (مانند درایو `Y:`)** تبدیل می‌کند!
 
-Drag and drop a 1.5 GB folder from your desktop into `Y:`, and CyDrive indexes the folder structure into an SQLite database, waits for Windows to finish copying, and uploads everything in the background via Telegram's MTProto protocol. Send a photo or document from your phone to your bot while commuting, and it will be waiting in your `Y:` drive when you get home.
+فقط کافیست یک پوشه حجیم را با موس بکشید و داخل درایو `Y:` ویندوز رها کنید؛ CyDrive ساختار پوشه‌ها را در دیتابیس هوشمند SQLite ثبت کرده و فایل‌ها را با پروتکل پرسرعت MTProto در تلگرام آپلود می‌کند. همچنین اگر بیرون از منزل باشید و با گوشی عکسی را به ربات تلگرام خود بفرستید، به محض بازگشت به خانه، آن عکس بدون نیاز به هیچ کابل یا نرم‌افزار جانبی داخل درایو `Y:` کامپیوترتان آماده استفاده است — **همه‌چیز بدون اشغال حتی ۱ بایت از فضای هارد دیسک فیزیکی سیستم شما!**
 
 ---
 
-## ⚡ Comparison: Why CyDrive Outclasses the Rest
+## ⚡ مقایسه جامع: چرا CyDrive بی‌رقیب است؟
 
-| Feature | 📁 CyDrive (v2.0) | 📦 Google Drive / Dropbox | 💬 Telegram "Saved Messages" |
+| قابلیت | 📁 CyDrive (نسخه ۲) | 📦 Google Drive / Dropbox | 💬 تلگرام ساده (Saved Messages) |
 |---|---|---|---|
-| **Storage Capacity** | **Unlimited (Free)** | 2 GB – 15 GB (Free limit) | Unlimited |
-| **Windows Explorer Integration** | **Native Drive Letter (`Y:`)** | Requires Heavy Desktop Sync Client | ❌ None (Chat only) |
-| **Zero Disk Bloat (On-Demand)** | ✅ Virtual VFS + LRU Cache | ⚠️ Partial (Smart Sync on paid plans) | ❌ Must download whole chat |
-| **Max Single File Size** | **2 GB (or unlimited with chunking)** | 5 TB (Paid) / 15 GB | 2 GB (4 GB with TG Premium) |
-| **Nested Folders & Tree Hierarchy** | ✅ SQLite VFS Index | ✅ Yes | ❌ No (Flat chat stream) |
-| **Kernel Driver Required** | ❌ **No (Native WebDAV)** | ⚠️ Yes (Virtual FS drivers) | ❌ No |
-| **Web Media Streaming UI** | ✅ Built-in Cyberpunk UI (`:8088`) | ✅ Standard Web UI | ⚠️ In-app player only |
-| **Client-Side Zero-Knowledge Encryption** | ✅ Optional AES-256-GCM | ❌ Proprietary Server-side | ⚠️ Server-side MTProto |
+| **ظرفیت ذخیره‌سازی** | **نامحدود و رایگان (Unlimited)** | ۲ تا ۱۵ گیگابایت (رایگان) | نامحدود و رایگان |
+| **ادغام در This PC ویندوز** | **درایو اختصاصی مستقل (`Y:`)** | نیازمند نرم‌افزارهای سنگین سینک | ❌ ندارد (فقط درون چت تلگرام) |
+| **استریم ابری بدون پر شدن هارد** | ✅ استریم زنده (Zero-Disk Bloat) | ⚠️ نیازمند پلن‌های پولی (Smart Sync) | ❌ باید کل فایل دانلود شود |
+| **حداکثر حجم هر فایل** | **۲ گیگابایت (یا نامحدود با قابلیت Chunking)** | ۱۵ گیگابایت (رایگان) / ۵ ترابایت | ۲ گیگابایت (۴ گیگ در پریمیوم) |
+| **پوشه‌بندی درختی و تودرتو** | ✅ دیتابیس سلسله‌مراتبی SQLite | ✅ دارد | ❌ ندارد (جریان چت خطی) |
+| **نیاز به درایورهای سنگین کرنل** | ❌ **خیر (WebDAV بومی ویندوز)** | ⚠️ بله (درایورهای مجازی فایل‌سیستم) | ❌ خیر |
+| **پنل وب اختصاصی با پلیر مدیا** | ✅ داشبورد سایبرپانکی مدرن (`:8088`) | ✅ پنل وب استاندارد | ⚠️ فقط پلیر داخلی تلگرام |
+| **رمزنگاری سمت کاربر (Zero-Knowledge)** | ✅ اختیاری با الگوریتم AES-256-GCM | ❌ رمزنگاری اختصاصی سمت سرور | ⚠️ پروتکل MTProto سرور |
 
 ---
 
-## ✨ Key Features
+## ✨ امکانات و قابلیت‌های برجسته
 
-- 🔄 **Real-Time Two-Way Sync:**
-  - Drop any file or nested folder into your local `Y:` drive $\rightarrow$ auto-uploaded to Telegram.
-  - Forward or upload any file to your Bot in Telegram $\rightarrow$ auto-downloaded and organized in your local drive.
-- 📁 **Native Windows Virtual Drive (`Y:`):**
-  - Appears inside **This PC** alongside your `C:` and `D:` drives.
-  - Auto-mounts on launch and cleans up gracefully on exit.
-- 🌐 **Cyberpunk Web Dashboard (`http://127.0.0.1:8088`):**
-  - Dark glassmorphism UI with live storage gauge, real-time file counters, search bar, and drag-and-drop zone.
-  - **In-browser Media Streaming:** Play MP4 videos, listen to FLAC/MP3 music, or view images without downloading them first.
-- 🗄️ **SQLite WAL Metadata Engine:**
-  - Maintains full directory paths, SHA-256 hashes, and Telegram message IDs.
-  - Instant search across hundreds of thousands of files in milliseconds.
-- 👁️ **Event-Driven File Watcher (`watchdog`):**
-  - No CPU-burning polling loops.
-  - Built-in `is_file_ready` lock verification: ensures large files (e.g. 1.8 GB video files) finish copying from Explorer before starting upload.
-- 🧩 **Massive File Chunking (>2GB Limit Bypass):**
-  - Automatically splits oversized files (5 GB, 20 GB+) into multi-part streams and seamlessly stitches them back together.
-- 🤖 **Interactive Telegram Remote Bot:**
-  - Control your drive from your smartphone: `/stats`, `/search <file>`, `/get <file>`, or drop files directly to sync.
-- 🔐 **Zero-Knowledge AES-256-GCM Encryption (Optional):**
-  - Encrypt files on your PC before transmission so that Telegram only ever sees encrypted blobs.
+- 🔄 **همگام‌سازی دوطرفه بلادرنگ (Two-Way Sync):**
+  - فایل یا پوشه‌ای را داخل درایو `Y:` ویندوز کپی کنید $\rightarrow$ بلافاصله در پس‌زمینه به تلگرام آپلود می‌شود.
+  - فایلی را در تلگرام برای ربات بفرستید $\rightarrow$ بلافاصله در درایو `Y:` و پنل وب ظاهر می‌شود.
+- 📁 **درایو مجازی بومی ویندوز (`Y:`):**
+  - در کنار درایوهای `C:` و `D:` در پنجره **This PC** ویندوز اکسپلورر دیده می‌شود.
+  - هنگام اجرای برنامه خودکار متصل (Mount) و هنگام خروج بدون دردسر جدا (Unmount) می‌شود.
+- 🌐 **داشبورد تحت وب سایبرپانکی (`http://127.0.0.1:8088`):**
+  - رابط کاربری مدرن با تم تاریک، انیمیشن‌های شیشه‌ای (Glassmorphism)، عقربه حجم مصرفی و آمار لحظه‌ای.
+  - **پخش آنلاین مدیا:** تماشای فیلم‌های MP4، گوش دادن به موزیک‌های FLAC/MP3 و نمایش عکس‌ها داخل مرورگر بدون نیاز به دانلود کل فایل!
+  - کادر آپلود با قابلیت کشیدن و رها کردن (Drag & Drop) و جستجوی آنی در میان فایل‌ها.
+- 🗄️ **موتور فراداده فوق‌سریع SQLite WAL:**
+  - ثبت ساختار درختی پوشه‌ها، هش SHA-256 فایل‌ها و شناسه‌های پیام در تلگرام.
+  - جستجو و فیلتر میان صدها هزار فایل در کسری از میلی‌ثانیه.
+- 👁️ **مانیتورینگ رویدادهای فایل‌سیستم با `watchdog`:**
+  - مصرف نزدیک به صفر پردازنده (بدون استفاده از حلقه‌های سنگین `os.walk`).
+  - مجهز به الگوریتم بررسی پایداری و باز بودن فایل (`is_file_ready`): تا زمانی که کپی فایل‌های سنگین در ویندوز کامل نشود، آپلود آغاز نمی‌شود تا فایل ناقص ذخیره نگردد.
+- 🧩 **تقسیم خودکار فایل‌های بسیار حجیم (Chunking بالای ۲ گیگابایت):**
+  - امکان آپلود و نگهداری فایل‌های سنگین (۵، ۲۰ یا ۵۰ گیگابایت) با تقسیم خودکار به پارت‌های استاندارد و اسمبل نامرئی هنگام دانلود.
+- 🤖 **ربات هوشمند کنترل از راه دور:**
+  - دستور `/stats` $\rightarrow$ گزارش حجم کل ابری و تعداد فایل‌های ذخیره‌شده.
+  - دستور `/search <نام_فایل>` $\rightarrow$ جستجوی سریع در دیتابیس درایو.
+  - دستور `/get <نام_فایل>` $\rightarrow$ دانلود مستقیم هر فایلی از روی گوشی.
+- 🔐 **رمزنگاری امن سمت کلاینت (اختیاری):**
+  - رمزنگاری فوق‌العاده امن سرتاسری با استاندارد نظامی AES-256-GCM؛ فایل‌ها پیش از خروج از کامپیوتر رمزگذاری می‌شوند و حتی تلگرام هم محتوای آن‌ها را نمی‌بیند.
 
 ---
 
-## 🏗️ Under the Hood: How It Works
+## 🏗️ معماری و سازوکار درونی سیستم
 
 ```mermaid
 flowchart TD
@@ -113,212 +116,177 @@ flowchart TD
 
 ---
 
-## 🚀 Quick Start in 3 Minutes
+## 🚀 آموزش گام‌به‌گام ۰ تا ۱۰۰ راه‌اندازی
 
-### Step 1: Clone and Install
+برای راه‌اندازی CyDrive فقط به ۵ دقیقه زمان نیاز دارید. مراحل زیر را به ترتیب دنبال کنید:
+
+### گام ۱: ساخت ربات و دریافت توکن تلگرام (کمتر از ۱ دقیقه)
+1. برنامه تلگرام را باز کنید و وارد ربات رسمی **[BotFather@](https://t.me/BotFather)** شوید.
+2. دکمه **Start** را بزنید و سپس دستور `/newbot` را ارسال کنید.
+3. یک **نام نمایشی** برای ربات خود بنویسید (مثلاً: `My Personal Drive`).
+4. یک **یوزرنیم یکتا** که آخر آن عبارت `bot` داشته باشد انتخاب کنید (مثلاً: `MyCloud_Fast_bot`).
+5. ربات BotFather یک توکن با ساختار زیر به شما تحویل می‌دهد:
+   ```text
+   7123456789:ABCdefGhIJKlmNoPQRstuVWXyz_123456
+   ```
+   این توکن را کپی کنید و در جایی نگه دارید.
+
+### گام ۲: دریافت شناسه کاربری (Chat ID)
+1. در تلگرام وارد ربات **[userinfobot@](https://t.me/userinfobot)** شوید و دکمه **Start** را بزنید.
+2. این ربات یک پیام حاوی شناسه عددی اکانت شما (مانند `123456789`) ارسال می‌کند. این عدد، همان **Chat ID** شماست.
+3. در نهایت، وارد چت ربات جدیدی که در گام اول ساختید شوید و روی دکمه **Start** کلیک کنید تا ربات اجازه ارسال پیام به شما را داشته باشد.
+
+### گام ۳: دانلود پروژه و نصب پکیج‌ها
+ترمینال ویندوز (PowerShell یا Command Prompt) را باز کرده و دستورات زیر را وارد کنید:
+
 ```bash
+# کلون کردن پروژه از گیت‌هاب
 git clone https://github.com/icynetx/CyDrive.git
+
+# ورود به پوشه پروژه
 cd CyDrive
+
+# نصب پکیج‌های مورد نیاز
 pip install -r requirements.txt
 ```
 
-### Step 2: Grab Your Telegram Bot Credentials (30 seconds)
-1. Open Telegram and search for [@BotFather](https://t.me/BotFather).
-2. Send `/newbot`, choose a name and username, and copy your **Bot Token**.
-3. Open [@userinfobot](https://t.me/userinfobot) and copy your **User ID / Chat ID**.
+### گام ۴: اجرای جادویی CyDrive
+دستور زیر را در ترمینال وارد کنید:
 
-### Step 3: Launch CyDrive
 ```bash
 python main.py
 ```
-> On first launch, the interactive CLI wizard will prompt for your token and Chat ID, automatically optimize Windows registry settings, launch the WebDAV and Web UI servers, and mount drive **`Y:`** in Windows Explorer!
+
+* **در اولین اجرا چه رخ می‌دهد؟**
+  1. بنر شیک ساینت نمایش داده می‌شود.
+  2. برنامه از شما **Bot Token** و سپس **Chat ID** را می‌پرسد.
+  3. حرف درایو مورد نظر (پیش‌فرض `Y:`) را انتخاب می‌کنید.
+  4. برنامه به طور خودکار اطلاعات را در `config.json` ذخیره می‌کند، سرورهای لازم را بالا می‌آورد، درایو `Y:` را در ویندوز ماونت می‌کند و پنل وب را استارت می‌زند!
 
 ---
 
-## 💻 CLI Commands & Power Tools
+## 🌐 داشبورد تحت وب سایبرپانکی
 
-CyDrive comes with a unified command-line manager:
-
-```bash
-# Start all background engines, WebDAV, Web Dashboard, and Auto-Mount
-python main.py run
-
-# Mount the Windows Network Drive (e.g. Y:)
-python main.py mount
-
-# Safely unmount and disconnect the drive
-python main.py unmount
-
-# One-click Windows WebDAV registry optimization (removes 50MB file size limit)
-python main.py fix-reg
-
-# View quick storage analytics and file count in terminal
-python main.py stats
-
-# Re-run the interactive setup wizard
-python main.py setup
-```
-
----
-
-## 🌐 Cyberpunk Web Dashboard
-
-When CyDrive is running, open your web browser and visit:
+پس از اجرای برنامه، مرورگر خود را باز کرده و وارد نشانی زیر شوید:
 👉 **`http://127.0.0.1:8088`**
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  [■] CyDrive v2.0 • CYNET ENGINE                  [ Search files... ] 🔍   │
+│  [■] CyDrive v2.0 • CYNET ENGINE                  [ جستجوی فایل‌ها... ] 🔍 │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  📊 Total Files: 1,420    |  ☁️ Cloud Volume: 42.8 GB  |  🟢 MTProto: Online│
+│  📊 تعداد فایل‌ها: ۱,۴۲۰    |  ☁️ حجم مصرفی: ۴۲.۸ GB  |  🟢 وضعیت تلگرام: آنلاین │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  [  Drag & Drop files here to instantly backup to Telegram Cloud  ]        │
+│  [       فایل‌ها را به این قسمت بکشید و رها کنید تا در تلگرام آپلود شوند       ]   │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  📄 Project_Final.mp4     │  1.42 GB  │  🟢 Synced  │  [Play] [Download]   │
-│  📁 Source_Code_Archive   │  320 MB   │  🟢 Synced  │  [Open] [Download]   │
-│  🖼️ Screenshot_2026.png   │  4.1 MB   │  🟢 Synced  │  [View] [Download]   │
+│  📄 Project_Final.mp4     │  ۱.۴۲ GB  │  🟢 سینک‌شده │  [پخش آنلاین] [دانلود] │
+│  📁 Source_Code_Archive   │  ۳۲۰ MB   │  🟢 سینک‌شده │  [باز کردن]   [دانلود] │
+│  🖼️ Screenshot_2026.png   │  ۴.۱ MB   │  🟢 سینک‌شده │  [مشاهده]     [دانلود] │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🎯 Practical Real-World Scenarios
+## 💻 دستورات خط فرمان (CLI)
 
-1. 🎮 **Gamers & Content Creators:**
-   Save 4K shadowplay recordings, OBS stream archives, and heavy video assets straight to `Y:`. They upload quietly in the background without eating your local SSD space.
-2. 👨‍💻 **Developers & Power Users:**
-   Keep offsite encrypted backups of your databases, Docker volumes, `.env` backups, and project archives with zero monthly cost.
-3. 📱 **Seamless Phone $\leftrightarrow$ PC Bridge:**
-   Take a photo on your phone, send it to your Telegram bot, and it's instantly inside your Windows PC's `Y:` drive without messy USB cables or third-party transfer apps.
-4. 🍿 **Personal Media Streaming:**
-   Drop your music and video library into CyDrive. Open `http://127.0.0.1:8088` from any device on your local network to stream media on demand.
+پروژه CyDrive دارای یک ابزار مدیریت جامع خط فرمان است:
+
+| دستور | توضیح عملکرد |
+|---|---|
+| `python main.py run` | اجرای کامل تمام سرویس‌ها (WebDAV، تلگرام، پنل وب و ماونت خودکار درایو) |
+| `python main.py mount` | اتصال و ماونت درایو شبکه ویندوز (مانند درایو `Y:`) |
+| `python main.py unmount` | قطع اتصال و حذف ایمن درایو شبکه از ویندوز اکسپلورر |
+| `python main.py fix-reg` | بهینه‌سازی خودکار رجیستری ویندوز برای حذف محدودیت ۵۰ مگابایتی WebDAV (تا ۴ گیگابایت) |
+| `python main.py stats` | نمایش سریع آمار حجم ابری، تعداد فایل‌ها و وضعیت دیتابیس در ترمینال |
+| `python main.py setup` | اجرای مجدد ویزارد تعاملی دریافت و ویرایش توکن و تنظیمات |
 
 ---
 
-## ❓ Frequently Asked Questions & Troubleshooting
+## ❓ سوالات متداول و عیب‌یابی (FAQs)
 
 <details>
-<summary><strong>Q: Why does Windows show "File size exceeds the limit allowed" when copying files over 50 MB?</strong></summary>
+<summary><strong>س: هنگام انتقال فایل‌های بالای ۵۰ مگابایت در ویندوز، ارور «File size exceeds the limit allowed» می‌گیرم. راه‌حل چیست؟</strong></summary>
 
-By default, the Windows native WebDAV client imposes a legacy 50 MB single-file safety limit. 
-CyDrive includes an automatic fix! Just run:
+کلاینت WebDAV پیش‌فرض ویندوز به صورت کارخانه‌ای انتقال تک‌فایل‌ها را به ۵۰ مگابایت محدود کرده است. 
+برای حذف کامل این محدودیت، کافیست فقط یک‌بار دستور زیر را در ترمینال اجرا کنید:
 ```bash
 python main.py fix-reg
 ```
-*(Or manually in PowerShell as Admin: `Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\WebClient\Parameters" -Name "FileSizeLimitInBytes" -Value 4294967295 -Type DWord` and restart `WebClient` service).*
+*(یا پاورشل را در حالت Run as Administrator باز کرده و دستور `Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\WebClient\Parameters" -Name "FileSizeLimitInBytes" -Value 4294967295 -Type DWord` را بزنید و سرویس WebClient را ری‌استارت کنید).*
 </details>
 
 <details>
-<summary><strong>Q: Can my Telegram account get banned for using CyDrive?</strong></summary>
+<summary><strong>س: آیا این برنامه هارد کامپیوتر من (درایو C) را پر می‌کند؟</strong></summary>
 
-**No.** CyDrive uses official Telegram Bot tokens and standard MTProto protocol through Telethon, strictly respecting Telegram's rate limits and FloodWait controls. It behaves just like any standard media backup bot.
+**خیر، به هیچ وجه!** معماری CyDrive بر پایه **سیستم فایل مجازی ابری (Zero-Disk Cloud Streaming)** طراحی شده است. تمام فایل‌های شما فقط در تلگرام ذخیره می‌شوند و در دیتابیس محلی فقط شناسه‌ها و حجم آن‌ها ایندکس می‌شود (۰ بایت اشغال هارد). تنها در زمان باز کردن یا پخش یک فایل، بایت‌های آن به صورت زنده و آنلاین استریم می‌شوند!
 </details>
 
 <details>
-<summary><strong>Q: What happens if I lose my internet connection during an upload?</strong></summary>
+<summary><strong>س: آیا اکانت تلگرام من به دلیل استفاده از این ابزار بن (مسدود) می‌شود؟</strong></summary>
 
-CyDrive's SQLite engine tracks the exact sync status of every file. If an upload is interrupted, the engine will automatically resume from where it left off once the connection is restored.
+**خیر.** این ابزار از توکن رسمی بات تلگرام و کلاینت استاندارد MTProto بر پایه کتابخانه محبوب Telethon استفاده می‌کند. تمام محدودیت‌های نرخ ارسال تلگرام (FloodWait) رعایت شده و رفتار برنامه کاملاً استاندارد و قانونی است.
 </details>
 
 <details>
-<summary><strong>Q: Does CyDrive fill up my local SSD/HDD?</strong></summary>
+<summary><strong>س: اگر در حین آپلود اتصال اینترنت قطع شود چه اتفاقی می‌افتد؟</strong></summary>
 
-**No.** CyDrive uses a Smart LRU Cache Manager. Files in Telegram are indexed virtually. You can configure a maximum local cache limit (e.g. 10 GB), and CyDrive will automatically evict older local copies while keeping the cloud files untouched.
+موتور SQLite تمام وضعیت فایل‌ها را ثبت می‌کند. به محض برقراری مجدد اینترنت، پردازش فایل‌های آپلود‌نشده از همان نقطه ادامه می‌یابد.
 </details>
 
 ---
 
-## 📁 Repository Structure
+## 📁 ساختار فایل‌های پروژه
 
 ```text
 CyDrive/
 ├── cydrive/
-│   ├── __init__.py             # Package descriptor & version metadata
-│   ├── cli.py                  # Rich terminal UI, service runner & diagnostics
-│   ├── config.py               # Config dataclass, schema validation & wizard
-│   ├── database.py             # SQLite WAL hierarchical VFS metadata engine
-│   ├── crypto.py               # Zero-Knowledge AES-256-GCM encryption
-│   ├── chunker.py              # Large file chunking (>2GB limit bypass)
-│   ├── telegram_client.py      # Telethon MTProto async worker & remote bot
-│   ├── watcher.py              # Watchdog real-time file event & lock watcher
-│   ├── cache_manager.py        # Smart on-demand LRU cache & hydration
-│   ├── webdav_server.py        # WsgiDAV & Cheroot WebDAV provider
-│   ├── web_ui/                 # Cyberpunk Web Dashboard UI
-│   │   ├── app.py              # aiohttp web server & REST API
-│   │   ├── static/             # Cyberpunk styling (CSS) & Interactive logic (JS)
-│   │   └── templates/index.html# Modern responsive dashboard
+│   ├── __init__.py             # اطلاعات ماژول و نگارش بسته
+│   ├── cli.py                  # رابط خط فرمان رنگی، هماهنگ‌کننده و جدول وضعیت
+│   ├── config.py               # مدیریت تنظیمات، اعتبارسنجی و ویزارد هوشمند
+│   ├── database.py             # موتور فراداده سلسله‌مراتبی SQLite در حالت WAL
+│   ├── crypto.py               # موتور رمزنگاری سرتاسری AES-256-GCM
+│   ├── chunker.py              # ماژول تقسیم فایل‌های حجیم بالای ۲ گیگابایت
+│   ├── telegram_client.py      # کلاینت ناهمگام MTProto تلگرام و کنترلر ربات
+│   ├── watcher.py              # مانیتورینگ رویدادهای زنده فایل سیستم و قفل فایل
+│   ├── cache_manager.py        # سیستم کش هوشمند بر اساس تقاضا (LRU Cache)
+│   ├── webdav_server.py        # سرور درایو مجازی WebDAV
+│   ├── web_ui/                 # داشبورد تحت وب سایبرپانکی
+│   │   ├── app.py              # سرور سبک aiohttp و وب‌سرویس REST
+│   │   ├── static/             # استایل‌های شیک CSS و کدهای تعاملی JS
+│   │   └── templates/index.html# قالب واکنش‌گرای پنل وب
 │   └── platform/
-│       └── windows.py          # Auto registry tuner & Windows drive mounter
-├── main.py                     # Primary execution entrypoint
-├── tgdrive.py                  # Backward-compatible legacy runner
-├── requirements.txt            # Python dependencies
-├── config.example.json         # Configuration schema template
-├── .gitignore                  # Git privacy & cache rules
-├── LICENSE                     # MIT Open Source License
-└── README.md                   # Complete documentation
+│       └── windows.py          # تنظیمات رجیستری و ماونتر خودکار درایو ویندوز
+├── main.py                     # نقطه ورود اصلی برنامه
+├── tgdrive.py                  # فایل ورود سازگار با نسخه‌های قبلی
+├── requirements.txt            # پکیج‌های پیش‌نیاز پایتون
+├── config.example.json         # نمونه فایل کانفیگ
+├── .gitignore                  # قوانین نادیده‌گیری فایل‌های محلی در گیت
+├── LICENSE                     # لایسنس متن‌باز MIT
+├── README.md                   # مستندات کامل فارسی
+└── README_EN.md                # مستندات کامل انگلیسی
 ```
 
 ---
 
-## 🇮🇷 راهنمای جامع فارسی (CyDrive)
+## 🤝 مشارکت در توسعه (Contributing)
 
-### 💡 چرا CyDrive ساخته شد؟
-اکثر سرویس‌های ابری مثل گوگل درایو یا دراپ‌باکس حجم‌های رایگان بسیار محدودی دارند (۲ تا ۱۵ گیگابایت) و برای فضای بیشتر باید ماهانه هزینه اشتراک دلاری بپردازید. در مقابل، **سرورهای ابری تلگرام فضایی نامحدود، پرسرعت و رایگان** در اختیار کاربران قرار می‌دهند.
-
-اما ذخیره فایل در بخش «Saved Messages» تلگرام مشکلات زیادی داشت:
-* فایل‌ها بدون پوشه‌بندی و به شکل یک چت طولانی نامنظم ذخیره می‌شدند.
-* دسترسی به آن‌ها از طریق کامپیوتر نیازمند باز کردن تلگرام، دانلود دستی و ذخیره مجدد بود.
-
-**پروژه CyDrive این مشکل را یک‌بار برای همیشه حل کرده است.** این برنامه فضای چت تلگرام شما را به یک **درایو هارددیسک واقعی در ویندوز (مانند درایو `Y:`)** تبدیل می‌کند!
+از هرگونه مشارکت، گزارش باگ یا افزودن قابلیت‌های جدید با آغوش باز استقبال می‌کنیم!
+1. ریپازیتوری را Fork کنید.
+2. شاخه ویژگی خود را بسازید (`git checkout -b feature/NewFeature`).
+3. تغییرات را کامیت کنید (`git commit -m 'feat: Add NewFeature'`).
+4. به شاخه خود پوش کنید (`git push origin feature/NewFeature`).
+5. یک Pull Request ایجاد نمایید.
 
 ---
 
-### ✨ قابلیت‌های اصلی نسخه ۲:
-1. **💾 درایو بومی در This PC ویندوز:** اتصال مستقیم از طریق پروتکل WebDAV بدون نیاز به نصب درایورهای جانبی.
-2. **🔄 همگام‌سازی دوطرفه (Two-Way Sync):** کشیدن فایل در درایو `Y:` ویندوز $\rightarrow$ آپلود آنی در تلگرام. ارسال فایل به ربات در تلگرام $\rightarrow$ ذخیره آنی در درایو کامپیوتر.
-3. **🌐 پنل وب سایبرپانکی (`http://127.0.0.1:8088`):** دارای پلیر آنلاین ویدیو و موزیک، گالری تصاویر، سیستم جستجوی زنده و پنل آپلود کشیدنی-رهاکردنی (Drag & Drop).
-4. **🗄️ موتور فراداده SQLite:** حفظ ساختار درختی پوشه‌ها و زیرپوشه‌ها و جلوگیری از سردرگمی در فایل‌ها.
-5. **👁️ مانیتورینگ هوشمند فایل‌ها (`watchdog`):** بررسی پایدار شدن کپی فایل‌های سنگین و جلوگیری از آپلود ناقص.
-6. **🧩 پشتیبانی از فایل‌های بسیار سنگین:** تقسیم خودکار فایل‌های بالای ۲ گیگابایت و اتصال مجدد آن‌ها هنگام دانلود.
-7. **🤖 کنترل از راه دور با ربات تلگرام:** مدیریت فایل‌ها با دستورات `/stats`، `/search` و `/get` از روی گوشی.
+## 🛡️ پروانه و لایسنس
+
+این پروژه تحت مجوز **MIT License** منتشر شده است. برای جزئیات بیشتر به فایل [`LICENSE`](LICENSE) مراجعه کنید.
 
 ---
 
-### 🚀 نحوه راه‌اندازی سریع در ۳ مرحله:
+## 🌐 ارتباط با ما و تیم توسعه
 
-```bash
-# ۱. کلون ریپازیتوری و نصب وابستگی‌ها
-git clone https://github.com/icynetx/CyDrive.git
-cd CyDrive
-pip install -r requirements.txt
-
-# ۲. اجرای برنامه
-python main.py
-```
-> در اولین اجرا، ویزارد خط فرمان توکن ربات (از [BotFather@](https://t.me/BotFather)) و Chat ID شما (از [userinfobot@](https://t.me/userinfobot)) را دریافت کرده، تنظیمات رجیستری ویندوز را اصلاح می‌کند و درایو `Y:` را در سیستم ماونت می‌نماید.
-
----
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome!
-1. Fork the Repository
-2. Create your Feature Branch (`git checkout -b feature/CoolFeature`)
-3. Commit your Changes (`git commit -m 'feat: Add CoolFeature'`)
-4. Push to the Branch (`git push origin feature/CoolFeature`)
-5. Open a Pull Request
-
----
-
-## 🛡️ License
-
-This project is licensed under the **MIT License** - see the [`LICENSE`](LICENSE) file for details.
-
----
-
-## 🌐 Community & Team
-
-- **Developed by:** [Cynet Security Team](https://cynetx.ir)
-- **Official GitHub:** [@icynetx](https://github.com/icynetx)
-- **Repository:** [https://github.com/icynetx/CyDrive](https://github.com/icynetx/CyDrive)
-- **Support & Inquiries:** [heyfiranam@gmail.com](mailto:heyfiranam@gmail.com)
+- **توسعه‌داده‌شده توسط:** [تیم امنیت سایبری ساینت (Cynet Security Team)](https://cynetx.ir)
+- **گیت‌هاب رسمی:** [@icynetx](https://github.com/icynetx)
+- **ریپازیتوری پروژه:** [https://github.com/icynetx/CyDrive](https://github.com/icynetx/CyDrive)
+- **پشتیبانی و ایمیل:** [heyfiranam@gmail.com](mailto:heyfiranam@gmail.com)
