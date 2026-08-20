@@ -106,6 +106,10 @@ class VirtualTelegramFile(DAVNonCollection):
             local_cached = self.cache_mgr.get_local_path(rel_path)
             if os.path.exists(local_cached):
                 file_size = os.path.getsize(local_cached)
+                if file_size == 0:
+                    # Skip initial 0-byte touch by Windows Explorer
+                    return
+
                 now = time.time()
                 self.file_record["size"] = file_size
                 self.file_record["mtime"] = now
@@ -159,6 +163,14 @@ class VirtualTelegramFolder(DAVCollection):
         self.db = db
         self.cache_mgr = cache_mgr
         self.telegram_engine = telegram_engine
+
+    def get_used_bytes(self) -> str:
+        stats = self.db.get_stats()
+        return str(stats.get("total_bytes", 0))
+
+    def get_available_bytes(self) -> str:
+        # 10 Terabytes available virtual cloud quota
+        return str(10 * 1024 * 1024 * 1024 * 1024)
 
     def get_member_names(self) -> List[str]:
         rel_path = "/" + self.path.strip("/").replace("\\", "/") if self.path.strip("/") else "/"
