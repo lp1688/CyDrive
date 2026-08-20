@@ -136,12 +136,20 @@ pip install -r requirements.txt
 python main.py
 ```
 
-**🐧 Linux & VPS Servers (Ubuntu / Debian / CentOS):**
+**🐧 Linux & VPS Servers (Ubuntu 22+/24+, Debian 12+, CentOS VPS):**
 ```bash
-sudo apt update && sudo apt install -y python3 python3-pip git
+sudo apt update && sudo apt install -y python3 python3-pip python3-venv git
 git clone https://github.com/icynetx/CyDrive.git
 cd CyDrive
+
+# Method 1 (Recommended Virtual Environment):
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
+python3 main.py
+
+# Method 2 (Direct Fast Install on VPS):
+pip install -r requirements.txt --break-system-packages
 python3 main.py
 ```
 

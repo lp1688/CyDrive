@@ -146,15 +146,23 @@ pip install -r requirements.txt
 python main.py
 ```
 
-**🐧 در سرورهای لینوکس (Ubuntu / Debian / CentOS / Arch VPS):**
+**🐧 در سرورهای لینوکس (Ubuntu 22+/24+, Debian 12+, CentOS VPS):**
 ```bash
-# نصب پکیج‌های پیش‌نیاز
-sudo apt update && sudo apt install -y python3 python3-pip git
+# نصب پیش‌نیازها
+sudo apt update && sudo apt install -y python3 python3-pip python3-venv git
 
-# کلون و اجرای پروژه
+# کلون و ورود به پوشه
 git clone https://github.com/icynetx/CyDrive.git
 cd CyDrive
+
+# روش اول (پیشنهادی با محیط مجازی):
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
+python3 main.py
+
+# روش دوم (نصب سریع مستقیم روی سرور):
+pip install -r requirements.txt --break-system-packages
 python3 main.py
 ```
 
