@@ -22,11 +22,13 @@ class TelegramSyncEngine:
             config.api_hash
         )
         self.is_connected = False
+        self.loop = self.client.loop
         self.on_file_received_callback: Optional[Callable] = None
 
     async def start(self):
         """Starts the Telethon client with bot token."""
         try:
+            self.loop = asyncio.get_running_loop()
             await self.client.start(bot_token=self.config.bot_token)
             self.is_connected = True
             self._register_handlers()
@@ -172,6 +174,7 @@ class TelegramSyncEngine:
                 is_uploaded=True,
                 is_cached=True
             )
+            print(f"✅ [CLOUD UPLOAD] Successfully uploaded {file_name} ({file_size // 1024} KB) to Telegram Cloud!")
             return msg.id
         except FloodWaitError as e:
             print(f"⏳ [Telegram Rate Limit] FloodWait for {e.seconds}s. Auto-waiting...")

@@ -69,17 +69,18 @@ class VirtualTelegramFile(DAVNonCollection):
             self.cache_mgr.evict_lru(self.file_record.get("size", 0))
             
             import asyncio
-            try:
-                loop = asyncio.get_event_loop()
-            except RuntimeError:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-
-            success = loop.run_until_complete(
-                self.telegram_engine.download_file_by_id(msg_id, local_cached)
-            )
-            if success and os.path.exists(local_cached):
-                return open(local_cached, "rb")
+            loop = getattr(self.telegram_engine, "loop", None) or self.telegram_engine.client.loop
+            if loop and loop.is_running():
+                future = asyncio.run_coroutine_threadsafe(
+                    self.telegram_engine.download_file_by_id(msg_id, local_cached),
+                    loop
+                )
+                try:
+                    success = future.result(timeout=60)
+                    if success and os.path.exists(local_cached):
+                        return open(local_cached, "rb")
+                except Exception as e:
+                    print(f"⚠️ [WebDAV Hydration Error] {e}")
 
         # Return empty stream fallback
         return io.BytesIO(b"")
@@ -124,17 +125,18 @@ class VirtualTelegramFile(DAVNonCollection):
                     is_cached=True
                 )
 
-                # Trigger upload to Telegram cloud
+                # Trigger upload to Telegram cloud using running MTProto event loop
                 if self.telegram_engine and self.telegram_engine.is_connected:
                     import asyncio
-                    try:
-                        loop = asyncio.get_event_loop()
+                    loop = getattr(self.telegram_engine, "loop", None) or self.telegram_engine.client.loop
+                    if loop and loop.is_running():
+                        print(f"📤 [WebDAV Upload Trigger] Queuing {clean_path} ({file_size // 1024} KB) for Telegram Cloud upload...")
                         asyncio.run_coroutine_threadsafe(
                             self.telegram_engine.upload_file(local_cached, clean_path),
                             loop
                         )
-                    except Exception as e:
-                        print(f"⚠️ [WebDAV Upload Trigger] {e}")
+                    else:
+                        print("⚠️ [WebDAV Warning] Telegram event loop is not running.")
 
     def handle_delete(self):
         """Handles file deletion."""
