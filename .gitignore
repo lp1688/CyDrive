@@ -15,9 +15,14 @@ config.json
 .env
 .env.local
 
-# Local Storage / Mapped Virtual Drive Directory
+# Local Storage & Database Cache
 Telegram_Drive/
+Telegram_Cache/
 downloads/
+*.db
+*.db-wal
+*.db-shm
+cydrive_meta.db*
 
 # Virtual Environments
 venv/
