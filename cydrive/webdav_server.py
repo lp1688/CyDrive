@@ -177,16 +177,40 @@ class VirtualTelegramFolder(DAVCollection):
         items = self.db.list_dir(parent_dir=rel_path)
         return [item["name"] for item in items]
 
+    def get_member_list(self) -> List:
+        """Return a list of direct members directly from database query."""
+        rel_path = "/" + self.path.strip("/").replace("\\", "/") if self.path.strip("/") else "/"
+        items = self.db.list_dir(parent_dir=rel_path)
+        members = []
+        for item in items:
+            p = "/" + item["rel_path"].strip("/").replace("\\", "/")
+            if item["is_dir"]:
+                members.append(VirtualTelegramFolder(p, self.environ, self.db, self.cache_mgr, self.telegram_engine))
+            else:
+                members.append(VirtualTelegramFile(p, self.environ, item, self.db, self.cache_mgr, self.telegram_engine))
+        return members
+
     def get_member(self, name: str):
-        rel_path = "/" + os.path.join(self.path.strip("/"), name).replace("\\", "/")
-        item = self.db.get_file(rel_path)
+        parent_dir = "/" + self.path.strip("/").replace("\\", "/") if self.path.strip("/") else "/"
+        clean_rel = "/" + os.path.join(parent_dir.lstrip("/"), name).replace("\\", "/")
+        
+        item = self.db.get_file(clean_rel)
+        if not item:
+            # Fallback by parent_dir and name lookup
+            items = self.db.list_dir(parent_dir=parent_dir)
+            for it in items:
+                if it["name"] == name:
+                    item = it
+                    clean_rel = "/" + it["rel_path"].strip("/").replace("\\", "/")
+                    break
+
         if not item:
             return None
 
         if item["is_dir"]:
-            return VirtualTelegramFolder(rel_path, self.environ, self.db, self.cache_mgr, self.telegram_engine)
+            return VirtualTelegramFolder(clean_rel, self.environ, self.db, self.cache_mgr, self.telegram_engine)
         else:
-            return VirtualTelegramFile(rel_path, self.environ, item, self.db, self.cache_mgr, self.telegram_engine)
+            return VirtualTelegramFile(clean_rel, self.environ, item, self.db, self.cache_mgr, self.telegram_engine)
 
     def support_etag(self) -> bool:
         return False
