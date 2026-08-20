@@ -183,10 +183,30 @@ Features included in the Web Dashboard:
 
 ## ❓ Frequently Asked Questions & Troubleshooting
 
-<details>
-<summary><strong>Q: Why does Windows show "File size exceeds the limit allowed" when copying files over 50 MB?</strong></summary>
+## 🔍 100% Transparent Technical Breakdown: Why Does Windows Explorer Show Local Disk Capacity?
 
-By default, the Windows native WebDAV client imposes a legacy 50 MB single-file safety limit. 
+A common question when mapping a WebDAV network drive on Windows:  
+> *«Why does the `Y:` drive display my physical hard drive's capacity (e.g., `Total size: 952 GB, Free: 263 GB`)? Is it consuming local disk space?»*
+
+### 💡 The Engineering Truth (Zero-Disk Storage Guarantee):
+
+1. **Windows WebClient Subsystem Behavior:**  
+   Local WebDAV drives (`127.0.0.1`) in Windows are handled by the Windows kernel `WebClient` redirector. By default, Windows Explorer falls back to querying the host machine's drive (`C:`) to render the graphical capacity bar.
+2. **Where are the files actually stored?**  
+   **100% on Telegram Cloud.** On your local machine, incoming/outgoing files are buffered temporarily in memory/stream only during transmission and are **automatically and immediately deleted from your disk** the millisecond Telegram confirms receipt.
+3. **Simple Proof Test (Verify for Yourself):**
+   - Check your available space on drive `C:` (e.g., `263.1 GB free`).
+   - Copy a large 500 MB or 1 GB file into your `Y:` virtual drive.
+   - Wait for `✅ [CLOUD UPLOAD] Successfully uploaded` in console.
+   - Re-check drive `C:` free space: **it remains exactly 263.1 GB (0 Bytes consumed)** and your project folder remains 0 Bytes.
+
+---
+
+## ❓ Frequently Asked Questions (FAQs)
+
+<details>
+<summary><strong>Q: I get "File size exceeds the limit allowed" when uploading files >50MB. How to fix?</strong></summary>
+
 CyDrive includes an automatic fix! Just run:
 ```bash
 python main.py fix-reg
@@ -197,7 +217,7 @@ python main.py fix-reg
 <details>
 <summary><strong>Q: Does CyDrive take up local hard drive space?</strong></summary>
 
-**No.** CyDrive uses a Pure Virtual VFS. Files stored in Telegram are indexed as lightweight SQLite metadata (0 bytes on local disk). Files are streamed on-demand when accessed or played!
+**No, absolutely not.** CyDrive uses a Pure Virtual VFS. Files stored in Telegram are indexed as lightweight SQLite metadata (0 bytes on local disk). Files are streamed on-demand when accessed or played, and temporary upload buffers are instantly purged.
 </details>
 
 <details>
