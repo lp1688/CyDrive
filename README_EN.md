@@ -170,6 +170,12 @@ python3 main.py
 
 ## 💻 CLI Commands & Power Tools
 
+<div align="center">
+
+![CyDrive Terminal CLI Preview](assets/cli_preview.png)
+
+</div>
+
 ```bash
 # Start all background engines, WebDAV, Web Dashboard, and Auto-Mount
 python main.py run
@@ -238,6 +244,12 @@ rclone sync /var/www/html/ cydrive:/Backup/ -P
 
 When CyDrive is running, open your web browser and visit:
 👉 **`http://127.0.0.1:8088`** (or `http://YOUR_SERVER_IP:8088` on a VPS)
+
+<div align="center">
+
+![CyDrive Cyberpunk Web Dashboard](assets/web_dashboard.png)
+
+</div>
 
 Features included in the Web Dashboard:
 - 📊 **Live Storage Metrics:** Real-time volume gauge and file counters.
