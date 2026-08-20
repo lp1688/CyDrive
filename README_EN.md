@@ -127,19 +127,36 @@ flowchart TD
 3. Open your new bot's chat and press **Start** (`/start`) so it has permission to message you.
 
 ### Step 3: Clone and Install Dependencies
-Open your terminal (PowerShell / Command Prompt) and run:
+
+**🪟 Windows (PowerShell / CMD):**
 ```bash
 git clone https://github.com/icynetx/CyDrive.git
 cd CyDrive
 pip install -r requirements.txt
+python main.py
+```
+
+**🐧 Linux & VPS Servers (Ubuntu / Debian / CentOS):**
+```bash
+sudo apt update && sudo apt install -y python3 python3-pip git
+git clone https://github.com/icynetx/CyDrive.git
+cd CyDrive
+pip install -r requirements.txt
+python3 main.py
+```
+
+**🍎 macOS:**
+```bash
+git clone https://github.com/icynetx/CyDrive.git
+cd CyDrive
+pip3 install -r requirements.txt
+python3 main.py
 ```
 
 ### Step 4: Launch CyDrive
-```bash
-python main.py
-```
-> On the first launch, the interactive wizard will ask for your **Bot Token** and **Chat ID**, then save them in `config.json`.
-> CyDrive will automatically check the Windows WebClient service, start the WebDAV server on `:8080`, launch the Web UI on `:8088`, and auto-mount drive **`Y:`** in Windows Explorer!
+
+* On first launch, the interactive wizard asks for your **Bot Token** and **Chat ID**, saving them to `config.json`.
+* CyDrive initializes the WebDAV cloud provider on port `8080`, launches the Cyberpunk Web Dashboard on port `8088`, connects to MTProto, and automatically mounts the virtual drive (`Y:` on Windows or `~/CyDrive` on Linux/macOS)!
 
 ---
 

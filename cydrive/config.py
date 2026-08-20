@@ -80,20 +80,31 @@ class CyDriveConfig:
         except ValueError:
             chat_id = chat_id_input
 
-        # Suggest best available drive letter
+        webdav_host = "127.0.0.1"
+        web_ui_host = "127.0.0.1"
+        
+        # Check OS for platform-specific questions
         from cydrive.platform.windows import WindowsMounter
-        best_letter = WindowsMounter.get_best_drive_letter("Y:") if WindowsMounter.is_windows() else "Y:"
-
-        drive_letter = input(f"👉 Choose Windows Drive Letter [default: {best_letter}]: ").strip().upper()
-        if not drive_letter:
-            drive_letter = best_letter
-        if not drive_letter.endswith(":"):
-            drive_letter += ":"
+        if WindowsMounter.is_windows():
+            best_letter = WindowsMounter.get_best_drive_letter("Y:")
+            drive_letter = input(f"👉 Choose Windows Drive Letter [default: {best_letter}]: ").strip().upper()
+            if not drive_letter:
+                drive_letter = best_letter
+            if not drive_letter.endswith(":"):
+                drive_letter += ":"
+        else:
+            drive_letter = "N/A"
+            is_server = input("👉 Running on remote Linux VPS/Server? Enable external Web UI access? (y/N): ").strip().lower()
+            if is_server == "y":
+                webdav_host = "0.0.0.0"
+                web_ui_host = "0.0.0.0"
 
         cfg = cls(
             bot_token=bot_token,
             chat_id=chat_id,
-            drive_letter=drive_letter
+            drive_letter=drive_letter,
+            webdav_host=webdav_host,
+            web_ui_host=web_ui_host
         )
         cfg.save(file_path)
         print(f"\n✅ Configuration successfully saved to {file_path}\n")
