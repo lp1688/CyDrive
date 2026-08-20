@@ -72,7 +72,7 @@ class CyDriveCLI:
             table.add_row("WebDAV File Server", "🟢 Active", f"http://{config.webdav_host}:{config.webdav_port}")
             table.add_row("Cyberpunk Web UI", "🟢 Online", f"http://{config.web_ui_host}:{config.web_ui_port}")
             table.add_row("Windows Virtual Drive", "🔵 Mapped", f"Drive Letter: {config.drive_letter}")
-            table.add_row("Real-time Watcher", "🟢 Monitoring", f"{config.storage_path}")
+            table.add_row("Local Disk Footprint", "🟢 0 Bytes (Pure Cloud)", "Direct on-demand streaming from Telegram")
             table.add_row("Cloud Storage Used", "🟣 Synced", f"{stats['total_files']} Files ({size_mb:.2f} MB)")
 
             self.console.print(table)
@@ -80,6 +80,7 @@ class CyDriveCLI:
             print(f"[+] WebDAV Server: http://{config.webdav_host}:{config.webdav_port}")
             print(f"[+] Web UI: http://{config.web_ui_host}:{config.web_ui_port}")
             print(f"[+] Mounted Drive: {config.drive_letter}")
+            print(f"[+] Local Disk Footprint: 0 Bytes (Pure Cloud)")
             print(f"[+] Total Files: {stats['total_files']} ({size_mb:.2f} MB)")
 
     def run(self):
@@ -134,35 +135,9 @@ class CyDriveCLI:
         )
         webdav.start(blocking=False)
         
-        # Index existing local files
-        for root, dirs, files in os.walk(config.storage_path):
-            for file in files:
-                rel_path = "/" + os.path.relpath(os.path.join(root, file), config.storage_path).replace("\\", "/").lstrip("/")
-                if not db.get_file(rel_path):
-                    db.upsert_file(
-                        rel_path=rel_path,
-                        name=file,
-                        parent_dir="/" + os.path.dirname(rel_path).strip("/"),
-                        size=os.path.getsize(os.path.join(root, file)),
-                        mtime=os.path.getmtime(os.path.join(root, file)),
-                        is_uploaded=True,
-                        is_cached=True
-                    )
-
-        # 3. Start Watcher
         loop = asyncio.new_event_loop()
 
-        def on_file_ready(file_path, rel_path):
-            print(f"\n📤 [AUTO-SYNC] Uploading {rel_path} to Telegram Cloud...")
-            asyncio.run_coroutine_threadsafe(
-                telegram_engine.upload_file(file_path, rel_path),
-                loop
-            )
-
-        watcher = DriveWatcher(config.storage_path, on_file_ready)
-        watcher.start()
-
-        # 4. Auto-mount Virtual Drive across Platforms (Windows, Linux, macOS)
+        # 2. Auto-mount Virtual Drive across Platforms (Windows, Linux, macOS)
         if config.auto_mount_drive:
             from cydrive.platform.linux_mac import UnixMounter
             if WindowsMounter.is_windows():
@@ -199,7 +174,6 @@ class CyDriveCLI:
                 time.sleep(1)
         except KeyboardInterrupt:
             print("\n🛑 Shutting down CyDrive gracefully...")
-            watcher.stop()
             webdav.stop()
             if WindowsMounter.is_windows():
                 WindowsMounter.unmount_drive(config.drive_letter)

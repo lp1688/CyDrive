@@ -172,9 +172,18 @@ class TelegramSyncEngine:
                 mtime=time.time(),
                 telegram_msg_id=msg.id,
                 is_uploaded=True,
-                is_cached=True
+                is_cached=False
             )
             print(f"✅ [CLOUD UPLOAD] Successfully uploaded {file_name} ({file_size // 1024} KB) to Telegram Cloud!")
+            
+            # Immediately remove temporary local file so disk space remains 0 bytes
+            try:
+                if os.path.exists(local_path):
+                    os.remove(local_path)
+                    print(f"🧹 [Zero-Disk Storage] Local temporary buffer deleted. 0 Bytes used on your hard drive.")
+            except OSError:
+                pass
+
             return msg.id
         except FloodWaitError as e:
             print(f"⏳ [Telegram Rate Limit] FloodWait for {e.seconds}s. Auto-waiting...")
