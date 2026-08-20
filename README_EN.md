@@ -142,14 +142,14 @@ sudo apt update && sudo apt install -y python3 python3-pip python3-venv git
 git clone https://github.com/icynetx/CyDrive.git
 cd CyDrive
 
-# Method 1 (Recommended Virtual Environment):
+# Method 1 (Recommended Virtual Environment - Zero System Conflicts):
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 python3 main.py
 
-# Method 2 (Direct Fast Install on VPS):
-pip install -r requirements.txt --break-system-packages
+# Method 2 (Direct System Install with Debian Ignore):
+pip install -r requirements.txt --break-system-packages --ignore-installed
 python3 main.py
 ```
 

@@ -155,14 +155,14 @@ sudo apt update && sudo apt install -y python3 python3-pip python3-venv git
 git clone https://github.com/icynetx/CyDrive.git
 cd CyDrive
 
-# روش اول (پیشنهادی با محیط مجازی):
+# روش اول (پیشنهادی و بدون تداخل با پکیج‌های دبیان):
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 python3 main.py
 
-# روش دوم (نصب سریع مستقیم روی سرور):
-pip install -r requirements.txt --break-system-packages
+# روش دوم (نصب مستقیم روی کل سرور بدون محیط مجازی):
+pip install -r requirements.txt --break-system-packages --ignore-installed
 python3 main.py
 ```
 
