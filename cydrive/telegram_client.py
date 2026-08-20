@@ -146,11 +146,14 @@ class TelegramSyncEngine:
             return None
 
         file_size = os.path.getsize(local_path)
-        file_name = os.path.basename(local_path)
+        clean_rel = "/" + rel_path.strip("/").replace("\\", "/")
+        file_name = os.path.basename(clean_rel)
+        if not file_name:
+            file_name = os.path.basename(local_path)
 
         caption = (
             f"🚀 **CyDrive Cloud Backup**\n"
-            f"📁 Path: `{rel_path}`\n"
+            f"📁 Path: `{clean_rel}`\n"
             f"📦 Size: `{file_size // 1024} KB`"
         )
 
@@ -159,13 +162,14 @@ class TelegramSyncEngine:
                 self.config.chat_id,
                 local_path,
                 caption=caption,
+                file_name=file_name,
                 progress_callback=progress_callback
             )
             
             # Record in SQLite VFS
-            parent = "/" + os.path.dirname(rel_path).strip("/").replace("\\", "/") if os.path.dirname(rel_path).strip("/").replace("\\", "/") else "/"
+            parent = "/" + os.path.dirname(clean_rel).strip("/").replace("\\", "/") if os.path.dirname(clean_rel).strip("/").replace("\\", "/") else "/"
             self.db.upsert_file(
-                rel_path=rel_path,
+                rel_path=clean_rel,
                 name=file_name,
                 parent_dir=parent,
                 size=file_size,

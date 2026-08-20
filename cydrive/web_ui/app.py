@@ -68,8 +68,8 @@ class CyWebDashboard:
             if not filename:
                 return web.json_response({"error": "No filename"}, status=400)
             
-            # Use temporary file to stream to Telegram without hoarding permanent disk space
-            temp_fd, temp_path = tempfile.mkstemp(prefix="cydrive_up_")
+            ext = os.path.splitext(filename)[1]
+            temp_fd, temp_path = tempfile.mkstemp(prefix="cydrive_up_", suffix=ext)
             try:
                 with open(temp_path, "wb") as f:
                     while chunk := await field.read_chunk():
