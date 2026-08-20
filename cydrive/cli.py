@@ -162,11 +162,18 @@ class CyDriveCLI:
         watcher = DriveWatcher(config.storage_path, on_file_ready)
         watcher.start()
 
-        # 4. Auto-mount Windows Drive
-        if config.auto_mount_drive and WindowsMounter.is_windows():
-            success, msg = WindowsMounter.mount_drive(config.drive_letter, f"http://{config.webdav_host}:{config.webdav_port}")
-            if success:
-                print(f"✅ Auto-Mounted {config.drive_letter} Drive in Windows Explorer")
+        # 4. Auto-mount Virtual Drive across Platforms (Windows, Linux, macOS)
+        if config.auto_mount_drive:
+            from cydrive.platform.linux_mac import UnixMounter
+            if WindowsMounter.is_windows():
+                WindowsMounter.optimize_webdav_registry()
+                success, msg = WindowsMounter.mount_drive(config.drive_letter, f"http://{config.webdav_host}:{config.webdav_port}")
+                if success:
+                    print(f"✅ Auto-Mounted {config.drive_letter} Virtual Drive in Windows Explorer")
+            elif UnixMounter.is_linux() or UnixMounter.is_macos():
+                success, msg = UnixMounter.mount_drive(None, f"http://{config.webdav_host}:{config.webdav_port}")
+                if success:
+                    print(f"✅ {msg}")
 
         # 5. Start Web UI & Telegram Loop
         def start_async_loop():
@@ -196,6 +203,9 @@ class CyDriveCLI:
             webdav.stop()
             if WindowsMounter.is_windows():
                 WindowsMounter.unmount_drive(config.drive_letter)
+            else:
+                from cydrive.platform.linux_mac import UnixMounter
+                UnixMounter.unmount_drive()
             print("👋 Goodbye!")
 
 def main():
