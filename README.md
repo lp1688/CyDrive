@@ -1,32 +1,22 @@
 # 🚀 سای‌درایو (CyDrive)
 
-<p align="center">
-  <img src="assets/banner.jpg" alt="CyDrive Banner" width="100%">
-</p>
+<div align="center">
 
-<p align="center">
-  <strong>تبدیل تلگرام به هارد دیسک ابری نامحدود و درایو بومی ویندوز</strong><br>
-  <em>توسعه‌داده‌شده توسط تیم امنیت سایبری ساینت (<strong><a href="https://cynetx.ir">Cynet Security Team</a></strong>)</em>
-</p>
+![CyDrive Banner](./assets/banner.jpg)
 
-<p align="center">
-  <a href="https://github.com/icynetx/CyDrive/stargazers"><img src="https://img.shields.io/github/stars/icynetx/CyDrive?style=for-the-badge&logo=github&color=00f3ff" alt="GitHub Stars"></a>
-  <a href="https://python.org"><img src="https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white&style=for-the-badge" alt="Python Version"></a>
-  <a href="https://telegram.org"><img src="https://img.shields.io/badge/Telegram-MTProto%20Engine-26A5E4?logo=telegram&logoColor=white&style=for-the-badge" alt="Telegram MTProto"></a>
-  <a href="https://en.wikipedia.org/wiki/WebDAV"><img src="https://img.shields.io/badge/Protocol-Native%20WebDAV-FFA500?style=for-the-badge" alt="Protocol WebDAV"></a>
-  <a href="http://127.0.0.1:8088"><img src="https://img.shields.io/badge/Dashboard-Cyberpunk%20UI%20(8088)-00f3ff?style=for-the-badge" alt="Web Dashboard"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-00ff88.svg?style=for-the-badge" alt="License: MIT"></a>
-</p>
+### **تبدیل تلگرام به هارد دیسک ابری نامحدود و درایو بومی ویندوز**
+*توسعه‌داده‌شده توسط تیم امنیت سایبری ساینت (**[Cynet Security Team](https://cynetx.ir)**)*
 
-<p align="center">
-  <a href="README_EN.md">🌐 English Documentation</a> •
-  <a href="#-چرا-cydrive">چرا CyDrive؟</a> •
-  <a href="#-امکانات-و-قابلیت‌های-برجسته">قابلیت‌های کلیدی</a> •
-  <a href="#-آموزش-گام‌به‌گام-۰-تا-۱۰۰-راه‌اندازی">آموزش راه‌اندازی</a> •
-  <a href="#-داشبورد-تحت-وب-سایبرپانکی">داشبورد وب</a> •
-  <a href="#-رابط-خط-فرمان-و-ابزارهای-cli">دستورات ترمینال</a> •
-  <a href="#-سوالات-متداول-و-عیب‌یابی-faqs">سوالات متداول</a>
-</p>
+[![Version](https://img.shields.io/badge/CyDrive-v2.0%20Pure%20Cloud-00f3ff?style=for-the-badge&logo=telegram&logoColor=white)](https://github.com/icynetx/CyDrive)
+[![Python Version](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://python.org)
+[![Telegram MTProto](https://img.shields.io/badge/Telegram-MTProto%20Engine-26A5E4?logo=telegram&logoColor=white&style=for-the-badge)](https://telegram.org)
+[![Protocol WebDAV](https://img.shields.io/badge/Protocol-Native%20WebDAV-FFA500?style=for-the-badge)](https://en.wikipedia.org/wiki/WebDAV)
+[![Web Dashboard](https://img.shields.io/badge/Dashboard-Cyberpunk%20UI%20(8088)-00f3ff?style=for-the-badge)](http://127.0.0.1:8088)
+[![License: MIT](https://img.shields.io/badge/License-MIT-00ff88.svg?style=for-the-badge)](LICENSE)
+
+[🌐 English Documentation](README_EN.md) • [چرا CyDrive؟](#-چرا-cydrive) • [قابلیت‌های کلیدی](#-امکانات-و-قابلیت‌های-برجسته) • [آموزش راه‌اندازی](#-آموزش-گام‌به‌گام-۰-تا-۱۰۰-راه‌اندازی) • [داشبورد وب](#-داشبورد-تحت-وب-سایبرپانکی) • [دستورات ترمینال](#-رابط-خط-فرمان-و-ابزارهای-cli) • [سوالات متداول](#-سوالات-متداول-و-عیب‌یابی-faqs)
+
+</div>
 
 ---
 
@@ -235,17 +225,21 @@ rclone sync /var/www/html/ cydrive:/MySiteBackup/ -P
 پس از اجرای برنامه، مرورگر خود را باز کرده و وارد نشانی زیر شوید:  
 👉 **`http://127.0.0.1:8088`** (یا `http://YOUR_SERVER_IP:8088` روی سرور VPS)
 
-<p align="center">
-  <img src="assets/web_dashboard.png" alt="CyDrive Cyberpunk Web Dashboard" width="100%">
-</p>
+<div align="center">
+
+![CyDrive Cyberpunk Web Dashboard](./assets/web_dashboard.png)
+
+</div>
 
 ---
 
 ## 💻 رابط خط فرمان و ابزارهای CLI
 
-<p align="center">
-  <img src="assets/cli_preview.png" alt="CyDrive Terminal CLI Preview" width="100%">
-</p>
+<div align="center">
+
+![CyDrive Terminal CLI Preview](./assets/cli_preview.png)
+
+</div>
 
 پروژه CyDrive دارای یک ابزار مدیریت جامع خط فرمان است:
 

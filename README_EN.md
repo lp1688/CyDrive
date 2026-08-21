@@ -1,32 +1,22 @@
 # 🚀 CyDrive
 
-<p align="center">
-  <img src="assets/banner.jpg" alt="CyDrive Banner" width="100%">
-</p>
+<div align="center">
 
-<p align="center">
-  <strong>Turn Telegram into an Infinite, Native Windows Hard Drive & Cyberpunk Cloud</strong><br>
-  <em>Crafted with precision by the <strong><a href="https://cynetx.ir">Cynet Security Team</a></strong></em>
-</p>
+![CyDrive Banner](./assets/banner.jpg)
 
-<p align="center">
-  <a href="https://github.com/icynetx/CyDrive/stargazers"><img src="https://img.shields.io/github/stars/icynetx/CyDrive?style=for-the-badge&logo=github&color=00f3ff" alt="GitHub Stars"></a>
-  <a href="https://python.org"><img src="https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white&style=for-the-badge" alt="Python Version"></a>
-  <a href="https://telegram.org"><img src="https://img.shields.io/badge/Telegram-MTProto%20Engine-26A5E4?logo=telegram&logoColor=white&style=for-the-badge" alt="Telegram MTProto"></a>
-  <a href="https://en.wikipedia.org/wiki/WebDAV"><img src="https://img.shields.io/badge/Protocol-Native%20WebDAV-FFA500?style=for-the-badge" alt="Protocol WebDAV"></a>
-  <a href="http://127.0.0.1:8088"><img src="https://img.shields.io/badge/Dashboard-Cyberpunk%20UI%20(8088)-00f3ff?style=for-the-badge" alt="Web Dashboard"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-00ff88.svg?style=for-the-badge" alt="License: MIT"></a>
-</p>
+### **Turn Telegram into an Infinite, Native Windows Hard Drive & Cyberpunk Cloud**
+*Crafted with precision by the **[Cynet Security Team](https://cynetx.ir)***
 
-<p align="center">
-  <a href="README.md">📖 نسخه کامل فارسی (Persian)</a> •
-  <a href="#-key-features">Features</a> •
-  <a href="#-0-to-100-step-by-step-setup-guide">Setup Guide</a> •
-  <a href="#-cyberpunk-web-dashboard">Web Dashboard</a> •
-  <a href="#-under-the-hood-how-it-works">How It Works</a> •
-  <a href="#-automated-test-suite">Testing</a> •
-  <a href="#-frequently-asked-questions--troubleshooting">FAQ</a>
-</p>
+[![Version](https://img.shields.io/badge/CyDrive-v2.0%20Pure%20Cloud-00f3ff?style=for-the-badge&logo=telegram&logoColor=white)](https://github.com/icynetx/CyDrive)
+[![Python Version](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://python.org)
+[![Telegram MTProto](https://img.shields.io/badge/Telegram-MTProto%20Engine-26A5E4?logo=telegram&logoColor=white&style=for-the-badge)](https://telegram.org)
+[![Protocol WebDAV](https://img.shields.io/badge/Protocol-Native%20WebDAV-FFA500?style=for-the-badge)](https://en.wikipedia.org/wiki/WebDAV)
+[![Web Dashboard](https://img.shields.io/badge/Dashboard-Cyberpunk%20UI%20(8088)-00f3ff?style=for-the-badge)](http://127.0.0.1:8088)
+[![License: MIT](https://img.shields.io/badge/License-MIT-00ff88.svg?style=for-the-badge)](LICENSE)
+
+[📖 نسخه کامل فارسی (Persian)](README.md) • [Features](#-key-features) • [Setup Guide](#-0-to-100-step-by-step-setup-guide) • [Web Dashboard](#-cyberpunk-web-dashboard) • [How It Works](#-under-the-hood-how-it-works) • [Testing](#-automated-test-suite) • [FAQ](#-frequently-asked-questions--troubleshooting)
+
+</div>
 
 ---
 
@@ -194,9 +184,11 @@ rclone sync /var/www/html/ cydrive:/Backup/ -P
 When CyDrive is running, open your web browser and visit:  
 👉 **`http://127.0.0.1:8088`** (or `http://YOUR_SERVER_IP:8088` on a VPS)
 
-<p align="center">
-  <img src="assets/web_dashboard.png" alt="CyDrive Cyberpunk Web Dashboard" width="100%">
-</p>
+<div align="center">
+
+![CyDrive Cyberpunk Web Dashboard](./assets/web_dashboard.png)
+
+</div>
 
 Features included in the Web Dashboard:
 - 📊 **Live Storage Metrics:** Real-time volume gauge and file counters.
@@ -209,9 +201,11 @@ Features included in the Web Dashboard:
 
 ## 💻 CLI Commands & Power Tools
 
-<p align="center">
-  <img src="assets/cli_preview.png" alt="CyDrive Terminal CLI Preview" width="100%">
-</p>
+<div align="center">
+
+![CyDrive Terminal CLI Preview](./assets/cli_preview.png)
+
+</div>
 
 ```bash
 # Start all background engines, WebDAV, Web Dashboard, and Auto-Mount
