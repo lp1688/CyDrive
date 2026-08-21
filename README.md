@@ -1,24 +1,32 @@
-<div dir="rtl">
-
 # 🚀 سای‌درایو (CyDrive)
 
-<div align="center" dir="ltr">
+<p align="center">
+  <img src="assets/banner.jpg" alt="CyDrive Banner" width="100%">
+</p>
 
-<img src="https://raw.githubusercontent.com/icynetx/CyDrive/main/assets/banner.jpg" alt="CyDrive Banner" width="100%" style="border-radius: 12px; margin-bottom: 1.5rem;" />
+<p align="center">
+  <strong>تبدیل تلگرام به هارد دیسک ابری نامحدود و درایو بومی ویندوز</strong><br>
+  <em>توسعه‌داده‌شده توسط تیم امنیت سایبری ساینت (<strong><a href="https://cynetx.ir">Cynet Security Team</a></strong>)</em>
+</p>
 
-### **تبدیل تلگرام به هارد دیسک ابری نامحدود و درایو بومی ویندوز**
-*توسعه‌داده‌شده توسط تیم امنیت سایبری ساینت (**[Cynet Security Team](https://cynetx.ir)***)
+<p align="center">
+  <a href="https://github.com/icynetx/CyDrive/stargazers"><img src="https://img.shields.io/github/stars/icynetx/CyDrive?style=for-the-badge&logo=github&color=00f3ff" alt="GitHub Stars"></a>
+  <a href="https://python.org"><img src="https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white&style=for-the-badge" alt="Python Version"></a>
+  <a href="https://telegram.org"><img src="https://img.shields.io/badge/Telegram-MTProto%20Engine-26A5E4?logo=telegram&logoColor=white&style=for-the-badge" alt="Telegram MTProto"></a>
+  <a href="https://en.wikipedia.org/wiki/WebDAV"><img src="https://img.shields.io/badge/Protocol-Native%20WebDAV-FFA500?style=for-the-badge" alt="Protocol WebDAV"></a>
+  <a href="http://127.0.0.1:8088"><img src="https://img.shields.io/badge/Dashboard-Cyberpunk%20UI%20(8088)-00f3ff?style=for-the-badge" alt="Web Dashboard"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-00ff88.svg?style=for-the-badge" alt="License: MIT"></a>
+</p>
 
-[![GitHub Stars](https://img.shields.io/github/stars/icynetx/CyDrive?style=for-the-badge&logo=github&color=00f3ff)](https://github.com/icynetx/CyDrive/stargazers)
-[![Python Version](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://python.org)
-[![Telegram MTProto](https://img.shields.io/badge/Telegram-MTProto%20Engine-26A5E4?logo=telegram&logoColor=white&style=for-the-badge)](https://telegram.org)
-[![Protocol WebDAV](https://img.shields.io/badge/Protocol-Native%20WebDAV-FFA500?style=for-the-badge)](https://en.wikipedia.org/wiki/WebDAV)
-[![Web Dashboard](https://img.shields.io/badge/Dashboard-Cyberpunk%20UI%20(8088)-00f3ff?style=for-the-badge)](http://127.0.0.1:8088)
-[![License: MIT](https://img.shields.io/badge/License-MIT-00ff88.svg?style=for-the-badge)](LICENSE)
-
-[🌐 English Documentation (English Version)](README_EN.md) • [چرا CyDrive؟](#-چرا-cydrive) • [قابلیت‌های کلیدی](#-امکانات-و-قابلیت‌های-برجسته) • [آموزش ۰ تا ۱۰۰ راه‌اندازی](#-آموزش-گام‌به‌گام-۰-تا-۱۰۰-راه‌اندازی) • [داشبورد وب](#-داشبورد-تحت-وب-سایبرپانکی) • [دستورات ترمینال](#-رابط-خط-فرمان-و-ابزارهای-cli) • [سوالات متداول](#-سوالات-متداول-و-عیب‌یابی-faqs)
-
-</div>
+<p align="center">
+  <a href="README_EN.md">🌐 English Documentation</a> •
+  <a href="#-چرا-cydrive">چرا CyDrive؟</a> •
+  <a href="#-امکانات-و-قابلیت‌های-برجسته">قابلیت‌های کلیدی</a> •
+  <a href="#-آموزش-گام‌به‌گام-۰-تا-۱۰۰-راه‌اندازی">آموزش راه‌اندازی</a> •
+  <a href="#-داشبورد-تحت-وب-سایبرپانکی">داشبورد وب</a> •
+  <a href="#-رابط-خط-فرمان-و-ابزارهای-cli">دستورات ترمینال</a> •
+  <a href="#-سوالات-متداول-و-عیب‌یابی-faqs">سوالات متداول</a>
+</p>
 
 ---
 
@@ -80,8 +88,6 @@
 
 ## 🏗️ معماری و سازوکار درونی سیستم
 
-<div dir="ltr">
-
 ```mermaid
 flowchart TD
     subgraph Windows Environment
@@ -112,8 +118,6 @@ flowchart TD
     CLIENT <-->|Fast MTProto| CLOUD
 ```
 
-</div>
-
 ---
 
 ## 🚀 آموزش گام‌به‌گام ۰ تا ۱۰۰ راه‌اندازی
@@ -121,32 +125,26 @@ flowchart TD
 برای راه‌اندازی CyDrive فقط به ۵ دقیقه زمان نیاز دارید. مراحل زیر را به ترتیب دنبال کنید:
 
 ### گام ۱: ساخت ربات و دریافت توکن تلگرام (کمتر از ۱ دقیقه)
-1. برنامه تلگرام را باز کنید و وارد ربات رسمی **[BotFather@](https://t.me/BotFather)** شوید.
+1. برنامه تلگرام را باز کنید و وارد ربات رسمی **[@BotFather](https://t.me/BotFather)** شوید.
 2. دکمه **Start** را بزنید و سپس دستور `/newbot` را ارسال کنید.
 3. یک **نام نمایشی** برای ربات خود بنویسید (مثلاً: `My Personal Drive`).
 4. یک **یوزرنیم یکتا** که آخر آن عبارت `bot` داشته باشد انتخاب کنید (مثلاً: `MyCloud_Fast_bot`).
 5. ربات BotFather یک توکن با ساختار زیر به شما تحویل می‌دهد:
 
-<div dir="ltr">
-
 ```text
 7123456789:ABCdefGhIJKlmNoPQRstuVWXyz_123456
 ```
 
-</div>
-
 این توکن را کپی کنید و در جایی نگه دارید.
 
 ### گام ۲: دریافت شناسه کاربری (Chat ID)
-1. در تلگرام وارد ربات **[userinfobot@](https://t.me/userinfobot)** شوید و دکمه **Start** را بزنید.
+1. در تلگرام وارد ربات **[@userinfobot](https://t.me/userinfobot)** شوید و دکمه **Start** را بزنید.
 2. این ربات یک پیام حاوی شناسه عددی اکانت شما (مانند `123456789`) ارسال می‌کند. این عدد، همان **Chat ID** شماست.
 3. در نهایت، وارد چت ربات جدیدی که در گام اول ساختید شوید و روی دکمه **Start** کلیک کنید تا ربات اجازه ارسال پیام به شما را داشته باشد.
 
 ### گام ۳: دانلود پروژه و نصب پکیج‌ها
 
 **🪟 در ویندوز (Windows PowerShell / CMD):**
-
-<div dir="ltr">
 
 ```bash
 git clone https://github.com/icynetx/CyDrive.git
@@ -155,11 +153,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-</div>
-
 **🐧 در سرورهای لینوکس (Ubuntu 22+/24+, Debian 12+, CentOS VPS):**
-
-<div dir="ltr">
 
 ```bash
 # نصب پیش‌نیازها
@@ -179,8 +173,6 @@ python3 main.py
 pip install -r requirements.txt --break-system-packages --ignore-installed
 python3 main.py
 ```
-
-</div>
 
 ### گام ۴: اجرای جادویی CyDrive
 
@@ -206,8 +198,6 @@ python3 main.py
 ### ۲. ماونت به عنوان یک پوشه ابری محلی در لینوکس (`~/CyDrive`):
 با نصب پکیج `davfs2`، یک پوشه اختصاصی متصل به کلود در مسیر `~/CyDrive` در اختیارتان قرار می‌گیرد:
 
-<div dir="ltr">
-
 ```bash
 # نصب ماونتر WebDAV در لینوکس
 sudo apt install -y davfs2
@@ -216,11 +206,7 @@ sudo apt install -y davfs2
 python3 main.py
 ```
 
-</div>
-
 اکنون تمامی دستورات لینوکس مستقیماً روی تلگرام اعمال می‌شوند:
-
-<div dir="ltr">
 
 ```bash
 # کپی یک فایل حجیم به کلود تلگرام
@@ -230,12 +216,8 @@ cp /var/backups/database.tar.gz ~/CyDrive/
 ls -la ~/CyDrive/
 ```
 
-</div>
-
 ### ۳. اتصال به Rclone و اسکریپت‌های خودکارسازی بکاپ سرور:
 سرور استاندارد WebDAV روی پورت `8080` فعال است. می‌توانید با ابزار قدرتمند **Rclone** آن را به عنوان یک ریموت کلود بی‌نهایت تعریف کنید:
-
-<div dir="ltr">
 
 ```bash
 # دستور تنظیم rclone
@@ -246,8 +228,6 @@ rclone config
 rclone sync /var/www/html/ cydrive:/MySiteBackup/ -P
 ```
 
-</div>
-
 ---
 
 ## 🌐 داشبورد تحت وب سایبرپانکی
@@ -255,21 +235,17 @@ rclone sync /var/www/html/ cydrive:/MySiteBackup/ -P
 پس از اجرای برنامه، مرورگر خود را باز کرده و وارد نشانی زیر شوید:  
 👉 **`http://127.0.0.1:8088`** (یا `http://YOUR_SERVER_IP:8088` روی سرور VPS)
 
-<div align="center" dir="ltr">
-
-<img src="https://raw.githubusercontent.com/icynetx/CyDrive/main/assets/web_dashboard.png" alt="CyDrive Cyberpunk Web Dashboard" width="100%" style="border-radius: 12px; margin: 1rem 0;" />
-
-</div>
+<p align="center">
+  <img src="assets/web_dashboard.png" alt="CyDrive Cyberpunk Web Dashboard" width="100%">
+</p>
 
 ---
 
 ## 💻 رابط خط فرمان و ابزارهای CLI
 
-<div align="center" dir="ltr">
-
-<img src="https://raw.githubusercontent.com/icynetx/CyDrive/main/assets/cli_preview.png" alt="CyDrive Terminal CLI Preview" width="100%" style="border-radius: 12px; margin: 1rem 0;" />
-
-</div>
+<p align="center">
+  <img src="assets/cli_preview.png" alt="CyDrive Terminal CLI Preview" width="100%">
+</p>
 
 پروژه CyDrive دارای یک ابزار مدیریت جامع خط فرمان است:
 
@@ -303,6 +279,17 @@ rclone sync /var/www/html/ cydrive:/MySiteBackup/ -P
 
 ---
 
+## 🧪 تست‌های خودکار و اعتبارسنجی کیفیت (Testing)
+
+پروژه CyDrive دارای یک سوییت کامل از تست‌های خودکار است که سلامت تمام ماژول‌ها را ارزیابی می‌کند:
+
+```bash
+# اجرای تمامی تست‌های یکپارچه‌سازی و اعتبارسنجی
+python -m unittest discover tests
+```
+
+---
+
 ## ❓ سوالات متداول و عیب‌یابی (FAQs)
 
 <details>
@@ -311,13 +298,9 @@ rclone sync /var/www/html/ cydrive:/MySiteBackup/ -P
 کلاینت WebDAV پیش‌فرض ویندوز به صورت کارخانه‌ای انتقال تک‌فایل‌ها را به ۵۰ مگابایت محدود کرده است.  
 برای حذف کامل این محدودیت، کافیست فقط یک‌بار دستور زیر را در ترمینال اجرا کنید:
 
-<div dir="ltr">
-
 ```bash
 python main.py fix-reg
 ```
-
-</div>
 
 *(یا پاورشل را در حالت Run as Administrator باز کرده و دستور `Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\WebClient\Parameters" -Name "FileSizeLimitInBytes" -Value 4294967295 -Type DWord` را بزنید و سرویس WebClient را ری‌استارت کنید).*
 </details>
@@ -344,8 +327,6 @@ python main.py fix-reg
 
 ## 📁 ساختار فایل‌های پروژه
 
-<div dir="ltr">
-
 ```text
 CyDrive/
 ├── assets/                     # بنرها، لوگوها و تصاویر پیش‌نمایش
@@ -371,6 +352,9 @@ CyDrive/
 │   └── platform/
 │       ├── windows.py          # تنظیمات رجیستری و ماونتر خودکار درایو ویندوز
 │       └── linux_mac.py        # ماونتر بومی دایرکتوری در لینوکس و مک‌او‌اس
+├── tests/                      # مجموعه تست‌های خودکار پروژه
+│   ├── test_all_features.py
+│   └── test_web_ui.py
 ├── main.py                     # نقطه ورود اصلی برنامه
 ├── tgdrive.py                  # فایل ورود سازگار با نسخه‌های قبلی
 ├── requirements.txt            # پکیج‌های پیش‌نیاز پایتون
@@ -380,8 +364,6 @@ CyDrive/
 ├── README.md                   # مستندات کامل فارسی
 └── README_EN.md                # مستندات کامل انگلیسی
 ```
-
-</div>
 
 ---
 
@@ -408,5 +390,3 @@ CyDrive/
 - **گیت‌هاب رسمی:** [@icynetx](https://github.com/icynetx)
 - **ریپازیتوری پروژه:** [https://github.com/icynetx/CyDrive](https://github.com/icynetx/CyDrive)
 - **پشتیبانی و ایمیل:** [heyfiranam@gmail.com](mailto:heyfiranam@gmail.com)
-
-</div>
