@@ -15,7 +15,10 @@ class VirtualTelegramFile(DAVNonCollection):
     """Virtual File Resource mapped directly to Telegram Cloud."""
 
     def __init__(self, path: str, environ: dict, file_record: dict, db: MetaDatabase, cache_mgr: CacheManager, telegram_engine=None):
-        super().__init__(path, environ)
+        env = dict(environ) if environ else {}
+        if "wsgidav.provider" not in env:
+            env["wsgidav.provider"] = PureVirtualTelegramProvider(db, cache_mgr, telegram_engine)
+        super().__init__(path, env)
         self.file_record = file_record or {}
         self.db = db
         self.cache_mgr = cache_mgr
@@ -72,11 +75,11 @@ class VirtualTelegramFile(DAVNonCollection):
             loop = getattr(self.telegram_engine, "loop", None) or self.telegram_engine.client.loop
             if loop and loop.is_running():
                 future = asyncio.run_coroutine_threadsafe(
-                    self.telegram_engine.download_file_by_id(msg_id, local_cached),
+                    self.telegram_engine.download_file_record(self.file_record, local_cached),
                     loop
                 )
                 try:
-                    success = future.result(timeout=60)
+                    success = future.result(timeout=180)
                     if success and os.path.exists(local_cached):
                         return open(local_cached, "rb")
                 except Exception as e:
@@ -159,7 +162,10 @@ class VirtualTelegramFolder(DAVCollection):
     """Virtual Folder Resource representing hierarchical directories in Telegram."""
 
     def __init__(self, path: str, environ: dict, db: MetaDatabase, cache_mgr: CacheManager, telegram_engine=None):
-        super().__init__(path, environ)
+        env = dict(environ) if environ else {}
+        if "wsgidav.provider" not in env:
+            env["wsgidav.provider"] = PureVirtualTelegramProvider(db, cache_mgr, telegram_engine)
+        super().__init__(path, env)
         self.db = db
         self.cache_mgr = cache_mgr
         self.telegram_engine = telegram_engine
@@ -267,9 +273,12 @@ class PureVirtualTelegramProvider(DAVProvider):
         self.telegram_engine = telegram_engine
 
     def get_resource_inst(self, path: str, environ: dict):
+        env = dict(environ) if environ else {}
+        env.setdefault("wsgidav.provider", self)
+
         clean_path = "/" + path.strip("/").replace("\\", "/") if path.strip("/") else "/"
         if clean_path == "/":
-            return VirtualTelegramFolder("/", environ, self.db, self.cache_mgr, self.telegram_engine)
+            return VirtualTelegramFolder("/", env, self.db, self.cache_mgr, self.telegram_engine)
 
         item = self.db.get_file(clean_path)
         if not item:

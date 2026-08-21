@@ -1,11 +1,12 @@
 let allFiles = [];
+let currentFilter = 'all';
 
 document.addEventListener("DOMContentLoaded", () => {
     loadDriveData();
     setupDropZone();
     setupSearch();
-    // Auto-refresh drive files and stats every 3 seconds
-    setInterval(loadDriveData, 3000);
+    // Auto-refresh drive files and stats every 4 seconds
+    setInterval(loadDriveData, 4000);
 });
 
 async function loadDriveData() {
@@ -22,7 +23,7 @@ async function loadDriveData() {
 
         if (filesRes.ok) {
             allFiles = await filesRes.json();
-            renderFilesTable(allFiles);
+            applyCurrentFilter();
         }
     } catch (err) {
         console.error("Error loading drive data:", err);
@@ -30,31 +31,81 @@ async function loadDriveData() {
 }
 
 function updateStatsUI(stats) {
-    document.getElementById("stat-total-files").innerText = stats.total_files;
+    const totalFilesEl = document.getElementById("stat-total-files");
+    if (totalFilesEl) totalFilesEl.innerText = stats.total_files || 0;
     
-    const mb = (stats.total_bytes / (1024 * 1024)).toFixed(1);
-    const gb = (stats.total_bytes / (1024 * 1024 * 1024)).toFixed(2);
-    const sizeStr = stats.total_bytes > (1024 * 1024 * 1024) ? `${gb} GB` : `${mb} MB`;
+    const bytes = stats.total_bytes || 0;
+    const mb = (bytes / (1024 * 1024)).toFixed(1);
+    const gb = (bytes / (1024 * 1024 * 1024)).toFixed(2);
+    const sizeStr = bytes > (1024 * 1024 * 1024) ? `${gb} GB` : `${mb} MB`;
     
-    document.getElementById("stat-total-size").innerText = sizeStr;
-    document.getElementById("storage-detail").innerText = `${sizeStr} / Unlimited`;
+    const sizeEl = document.getElementById("stat-total-size");
+    if (sizeEl) sizeEl.innerText = sizeStr;
+
+    const storageDetailEl = document.getElementById("storage-detail");
+    if (storageDetailEl) storageDetailEl.innerText = `${sizeStr} / Unlimited`;
     
+    // Calculate storage percentage (relative visual gauge, min 5%, up to realistic quota)
+    const storageBar = document.getElementById("storage-bar");
+    const storagePercent = document.getElementById("storage-percent");
+    if (storageBar && storagePercent) {
+        // Visual indicator of active drive
+        const pct = Math.min(100, Math.max(3, Math.round((bytes / (100 * 1024 * 1024 * 1024)) * 100)));
+        storageBar.style.width = `${pct}%`;
+        storagePercent.innerText = `${pct}%`;
+    }
+
     if (stats.drive_letter) {
         const letterEl = document.getElementById("drive-letter");
         if (letterEl) letterEl.innerText = stats.drive_letter;
     }
 }
 
+function filterType(type) {
+    currentFilter = type;
+    
+    // Update active nav-item class
+    document.querySelectorAll(".nav-menu .nav-item").forEach(item => {
+        item.classList.remove("active");
+    });
+
+    const eventTarget = window.event ? window.event.currentTarget : null;
+    if (eventTarget) {
+        eventTarget.classList.add("active");
+    }
+
+    applyCurrentFilter();
+}
+
+function applyCurrentFilter() {
+    let filtered = allFiles;
+
+    if (currentFilter === 'media') {
+        filtered = allFiles.filter(f => isMedia(f.name));
+    } else if (currentFilter === 'documents') {
+        filtered = allFiles.filter(f => isDocument(f.name));
+    }
+
+    const searchInput = document.getElementById("search-input");
+    if (searchInput && searchInput.value.trim()) {
+        const q = searchInput.value.toLowerCase().trim();
+        filtered = filtered.filter(f => f.name.toLowerCase().includes(q));
+    }
+
+    renderFilesTable(filtered);
+}
+
 function renderFilesTable(files) {
     const tbody = document.getElementById("files-tbody");
-    document.getElementById("file-count-label").innerText = `${files.length} items`;
+    const countLabel = document.getElementById("file-count-label");
+    if (countLabel) countLabel.innerText = `${files.length} items`;
 
     if (!files || files.length === 0) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem;">
-                    <i class="fa-solid fa-folder-open" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
-                    No files found in your CyDrive. Drag and drop files above to start!
+                    <i class="fa-solid fa-folder-open" style="font-size: 2.2rem; margin-bottom: 0.8rem; display: block; color: var(--accent-cyan); opacity: 0.6;"></i>
+                    No files found in this view. Drag and drop files above to sync to Telegram Cloud!
                 </td>
             </tr>
         `;
@@ -69,20 +120,24 @@ function renderFilesTable(files) {
             ? '<span class="badge-status badge-synced"><i class="fa-solid fa-circle-check"></i> Synced</span>'
             : '<span class="badge-status badge-uploading"><i class="fa-solid fa-rotate fa-spin"></i> Syncing</span>';
 
+        const isDir = Boolean(file.is_dir);
+        const encName = encodeURIComponent(file.name);
+
         return `
             <tr>
                 <td>
                     <div class="file-name-cell">
                         ${icon}
-                        <span>${escapeHtml(file.name)}</span>
+                        <span title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</span>
                     </div>
                 </td>
                 <td>${sizeStr}</td>
                 <td>${statusBadge}</td>
                 <td>${dateStr}</td>
                 <td>
-                    <a href="/api/download/${encodeURIComponent(file.name)}" class="action-btn" title="Download"><i class="fa-solid fa-download"></i></a>
-                    ${isMedia(file.name) ? `<button class="action-btn" title="Preview" onclick="previewMedia('${encodeURIComponent(file.name)}')"><i class="fa-solid fa-play"></i></button>` : ''}
+                    ${!isDir ? `<a href="/api/download/${encName}" class="action-btn" title="Download"><i class="fa-solid fa-download"></i></a>` : ''}
+                    ${!isDir && isMedia(file.name) ? `<button class="action-btn" title="Stream Online" onclick="previewMedia('${encName}')"><i class="fa-solid fa-play"></i></button>` : ''}
+                    <button class="action-btn btn-delete" title="Delete from Cloud" onclick="deleteFile('${encName}')"><i class="fa-solid fa-trash-can"></i></button>
                 </td>
             </tr>
         `;
@@ -93,15 +148,15 @@ function getFileIcon(name, isDir) {
     if (isDir) return '<i class="fa-solid fa-folder" style="color: #ffd166; font-size: 1.2rem;"></i>';
     const ext = name.split('.').pop().toLowerCase();
     
-    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext)) {
         return '<i class="fa-solid fa-file-image" style="color: #00f3ff; font-size: 1.2rem;"></i>';
-    } else if (['mp4', 'mkv', 'avi', 'mov'].includes(ext)) {
+    } else if (['mp4', 'mkv', 'avi', 'mov', 'webm'].includes(ext)) {
         return '<i class="fa-solid fa-file-video" style="color: #ff007f; font-size: 1.2rem;"></i>';
-    } else if (['mp3', 'wav', 'flac', 'ogg'].includes(ext)) {
+    } else if (['mp3', 'wav', 'flac', 'ogg', 'm4a'].includes(ext)) {
         return '<i class="fa-solid fa-file-audio" style="color: #c084fc; font-size: 1.2rem;"></i>';
-    } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
+    } else if (['zip', 'rar', '7z', 'tar', 'gz', 'bz2'].includes(ext)) {
         return '<i class="fa-solid fa-file-zipper" style="color: #f77f00; font-size: 1.2rem;"></i>';
-    } else if (['pdf', 'doc', 'docx', 'txt'].includes(ext)) {
+    } else if (['pdf', 'doc', 'docx', 'txt', 'csv', 'xlsx', 'pptx', 'json', 'py', 'js', 'html', 'css'].includes(ext)) {
         return '<i class="fa-solid fa-file-lines" style="color: #00ff88; font-size: 1.2rem;"></i>';
     }
     return '<i class="fa-solid fa-file" style="color: #8b9bb4; font-size: 1.2rem;"></i>';
@@ -109,7 +164,12 @@ function getFileIcon(name, isDir) {
 
 function isMedia(name) {
     const ext = name.split('.').pop().toLowerCase();
-    return ['mp4', 'webm', 'mp3', 'wav', 'jpg', 'png', 'gif', 'webp'].includes(ext);
+    return ['mp4', 'webm', 'mkv', 'avi', 'mp3', 'wav', 'flac', 'ogg', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext);
+}
+
+function isDocument(name) {
+    const ext = name.split('.').pop().toLowerCase();
+    return ['pdf', 'doc', 'docx', 'txt', 'md', 'csv', 'xlsx', 'pptx', 'json', 'xml', 'py', 'js', 'html', 'css', 'sql', 'sh'].includes(ext);
 }
 
 function previewMedia(fileName) {
@@ -122,12 +182,12 @@ function previewMedia(fileName) {
     modalTitle.innerText = decoded;
     const url = `/api/download/${fileName}`;
 
-    if (['mp4', 'webm'].includes(ext)) {
-        modalBody.innerHTML = `<video controls autoplay style="width: 100%; border-radius: 10px;"><source src="${url}"></video>`;
-    } else if (['mp3', 'wav'].includes(ext)) {
-        modalBody.innerHTML = `<audio controls autoplay style="width: 100%; margin-top: 1rem;"><source src="${url}"></audio>`;
+    if (['mp4', 'webm', 'mkv', 'avi'].includes(ext)) {
+        modalBody.innerHTML = `<video controls autoplay style="width: 100%; border-radius: 10px; box-shadow: 0 0 25px rgba(0,243,255,0.2);"><source src="${url}"></video>`;
+    } else if (['mp3', 'wav', 'flac', 'ogg'].includes(ext)) {
+        modalBody.innerHTML = `<audio controls autoplay style="width: 100%; margin-top: 1.5rem;"><source src="${url}"></audio>`;
     } else {
-        modalBody.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 500px; border-radius: 10px; display: block; margin: 0 auto;">`;
+        modalBody.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 520px; border-radius: 10px; display: block; margin: 0 auto; box-shadow: 0 0 30px rgba(0,243,255,0.25);">`;
     }
 
     modal.style.display = "flex";
@@ -135,25 +195,47 @@ function previewMedia(fileName) {
 
 function closeModal() {
     const modal = document.getElementById("media-modal");
-    document.getElementById("modal-body").innerHTML = "";
-    modal.style.display = "none";
+    if (modal) {
+        document.getElementById("modal-body").innerHTML = "";
+        modal.style.display = "none";
+    }
+}
+
+async function deleteFile(encodedName) {
+    const fileName = decodeURIComponent(encodedName);
+    if (!confirm(`Are you sure you want to delete "${fileName}" from CyDrive Cloud?`)) {
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/delete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ filename: fileName })
+        });
+
+        if (res.ok) {
+            loadDriveData();
+        } else {
+            alert("Could not delete file from cloud.");
+        }
+    } catch (err) {
+        console.error("Delete error:", err);
+    }
 }
 
 function setupSearch() {
     const searchInput = document.getElementById("search-input");
-    searchInput.addEventListener("input", (e) => {
-        const query = e.target.value.toLowerCase().trim();
-        if (!query) {
-            renderFilesTable(allFiles);
-            return;
-        }
-        const filtered = allFiles.filter(f => f.name.toLowerCase().includes(query));
-        renderFilesTable(filtered);
-    });
+    if (searchInput) {
+        searchInput.addEventListener("input", () => {
+            applyCurrentFilter();
+        });
+    }
 }
 
 function setupDropZone() {
     const dropZone = document.getElementById("drop-zone");
+    if (!dropZone) return;
     
     ['dragenter', 'dragover'].forEach(name => {
         dropZone.addEventListener(name, (e) => {

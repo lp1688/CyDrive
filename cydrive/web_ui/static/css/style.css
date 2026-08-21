@@ -406,11 +406,19 @@ body {
     cursor: pointer;
     margin-right: 0.5rem;
     font-size: 1rem;
-    transition: color 0.2s;
+    transition: all 0.2s ease;
+    padding: 0.3rem 0.5rem;
+    border-radius: 6px;
 }
 
 .action-btn:hover {
     color: var(--accent-cyan);
+    background: rgba(0, 243, 255, 0.1);
+}
+
+.action-btn.btn-delete:hover {
+    color: #ff3366;
+    background: rgba(255, 51, 102, 0.15);
 }
 
 /* Modal */

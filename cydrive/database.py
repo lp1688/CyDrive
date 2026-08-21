@@ -150,9 +150,40 @@ class MetaDatabase:
             cursor.execute("SELECT * FROM files WHERE name LIKE ? OR rel_path LIKE ? ORDER BY is_dir DESC, name ASC", (pattern, pattern))
             return [dict(row) for row in cursor.fetchall()]
 
+    def upsert_chunk(
+        self,
+        file_id: int,
+        chunk_index: int,
+        telegram_msg_id: int,
+        size: int,
+        sha256: Optional[str] = None
+    ):
+        with self._get_conn() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO chunks (file_id, chunk_index, telegram_msg_id, size, sha256)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(file_id, chunk_index) DO UPDATE SET
+                    telegram_msg_id=excluded.telegram_msg_id,
+                    size=excluded.size,
+                    sha256=coalesce(excluded.sha256, chunks.sha256)
+            """, (file_id, chunk_index, telegram_msg_id, size, sha256))
+            conn.commit()
+
+    def get_chunks_by_file_id(self, file_id: int) -> List[Dict[str, Any]]:
+        with self._get_conn() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM chunks WHERE file_id = ? ORDER BY chunk_index ASC", (file_id,))
+            return [dict(row) for row in cursor.fetchall()]
+
     def delete_file(self, rel_path: str):
         with self._get_conn() as conn:
             cursor = conn.cursor()
+            cursor.execute("SELECT id FROM files WHERE rel_path = ?", (rel_path,))
+            row = cursor.fetchone()
+            if row:
+                file_id = row["id"]
+                cursor.execute("DELETE FROM chunks WHERE file_id = ?", (file_id,))
             cursor.execute("DELETE FROM files WHERE rel_path = ?", (rel_path,))
             conn.commit()
 
