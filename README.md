@@ -4,7 +4,7 @@
 
 <div align="center" dir="ltr">
 
-![CyDrive Banner](assets/banner.jpg)
+<img src="https://raw.githubusercontent.com/icynetx/CyDrive/main/assets/banner.jpg" alt="CyDrive Banner" width="100%" style="border-radius: 12px; margin-bottom: 1.5rem;" />
 
 ### **تبدیل تلگرام به هارد دیسک ابری نامحدود و درایو بومی ویندوز**
 *توسعه‌داده‌شده توسط تیم امنیت سایبری ساینت (**[Cynet Security Team](https://cynetx.ir)***)
@@ -257,7 +257,7 @@ rclone sync /var/www/html/ cydrive:/MySiteBackup/ -P
 
 <div align="center" dir="ltr">
 
-![CyDrive Cyberpunk Web Dashboard](assets/web_dashboard.png)
+<img src="https://raw.githubusercontent.com/icynetx/CyDrive/main/assets/web_dashboard.png" alt="CyDrive Cyberpunk Web Dashboard" width="100%" style="border-radius: 12px; margin: 1rem 0;" />
 
 </div>
 
@@ -267,7 +267,7 @@ rclone sync /var/www/html/ cydrive:/MySiteBackup/ -P
 
 <div align="center" dir="ltr">
 
-![CyDrive Terminal CLI Preview](assets/cli_preview.png)
+<img src="https://raw.githubusercontent.com/icynetx/CyDrive/main/assets/cli_preview.png" alt="CyDrive Terminal CLI Preview" width="100%" style="border-radius: 12px; margin: 1rem 0;" />
 
 </div>
 

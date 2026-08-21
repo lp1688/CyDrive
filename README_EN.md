@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![CyDrive Banner](assets/banner.jpg)
+<img src="https://raw.githubusercontent.com/icynetx/CyDrive/main/assets/banner.jpg" alt="CyDrive Banner" width="100%" style="border-radius: 12px; margin-bottom: 1.5rem;" />
 
 ### **Turn Telegram into an Infinite, Native Windows Hard Drive & Cyberpunk Cloud**
 *Crafted with precision by the **[Cynet Security Team](https://cynetx.ir)***
@@ -172,7 +172,7 @@ python3 main.py
 
 <div align="center">
 
-![CyDrive Terminal CLI Preview](assets/cli_preview.png)
+<img src="https://raw.githubusercontent.com/icynetx/CyDrive/main/assets/cli_preview.png" alt="CyDrive Terminal CLI Preview" width="100%" style="border-radius: 12px; margin: 1rem 0;" />
 
 </div>
 
@@ -247,7 +247,7 @@ When CyDrive is running, open your web browser and visit:
 
 <div align="center">
 
-![CyDrive Cyberpunk Web Dashboard](assets/web_dashboard.png)
+<img src="https://raw.githubusercontent.com/icynetx/CyDrive/main/assets/web_dashboard.png" alt="CyDrive Cyberpunk Web Dashboard" width="100%" style="border-radius: 12px; margin: 1rem 0;" />
 
 </div>
 

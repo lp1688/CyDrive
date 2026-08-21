@@ -3,7 +3,7 @@ import sys
 import tempfile
 import unittest
 import asyncio
-from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
+from aiohttp.test_utils import AioHTTPTestCase
 from aiohttp import web, FormData
 
 sys.path.insert(0, os.path.abspath("."))
@@ -32,7 +32,6 @@ class TestWebDashboardEndpoints(AioHTTPTestCase):
         import shutil
         shutil.rmtree(self.test_dir, ignore_errors=True)
 
-    @unittest_run_loop
     async def test_01_index_html(self):
         """Tests index page HTML delivery."""
         resp = await self.client.request("GET", "/")
@@ -41,7 +40,6 @@ class TestWebDashboardEndpoints(AioHTTPTestCase):
         self.assertIn("CyDrive", text)
         self.assertIn("Cloud Drive", text)
 
-    @unittest_run_loop
     async def test_02_stats_api(self):
         """Tests /api/stats JSON endpoint."""
         resp = await self.client.request("GET", "/api/stats")
@@ -51,7 +49,6 @@ class TestWebDashboardEndpoints(AioHTTPTestCase):
         self.assertEqual(data["chat_id"], 7540135753)
         self.assertEqual(data["drive_letter"], "Y:")
 
-    @unittest_run_loop
     async def test_03_upload_and_list_and_delete_api(self):
         """Tests upload, list, and delete workflow via Web API."""
         # 1. Upload mock file

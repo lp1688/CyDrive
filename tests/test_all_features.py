@@ -25,7 +25,7 @@ class TestCyDriveAllFeatures(unittest.TestCase):
         self.db = MetaDatabase(self.db_path)
         self.cache_mgr = CacheManager(self.cache_dir, limit_gb=1)
 
-    def tearfDown(self):
+    def tearDown(self):
         import shutil
         shutil.rmtree(self.test_dir, ignore_errors=True)
 
