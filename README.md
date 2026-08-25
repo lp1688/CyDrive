@@ -7,7 +7,7 @@
 ### **تبدیل تلگرام به هارد دیسک ابری نامحدود و درایو بومی ویندوز**
 *توسعه‌داده‌شده توسط تیم امنیت سایبری ساینت (**[Cynet Security Team](https://cynetx.ir)**)*
 
-[![Version](https://img.shields.io/badge/CyDrive-v2.0%20Pure%20Cloud-00f3ff?style=for-the-badge&logo=telegram&logoColor=white)](https://github.com/icynetx/CyDrive)
+[![Version](https://img.shields.io/badge/CyDrive-v2.0%20Pure%20Cloud-00f3ff?style=for-the-badge&logo=telegram&logoColor=white)](https://github.com/thecynetx/CyDrive)
 [![Python Version](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://python.org)
 [![Telegram MTProto](https://img.shields.io/badge/Telegram-MTProto%20Engine-26A5E4?logo=telegram&logoColor=white&style=for-the-badge)](https://telegram.org)
 [![Protocol WebDAV](https://img.shields.io/badge/Protocol-Native%20WebDAV-FFA500?style=for-the-badge)](https://en.wikipedia.org/wiki/WebDAV)
@@ -137,7 +137,7 @@ flowchart TD
 **🪟 در ویندوز (Windows PowerShell / CMD):**
 
 ```bash
-git clone https://github.com/icynetx/CyDrive.git
+git clone https://github.com/thecynetx/CyDrive.git
 cd CyDrive
 pip install -r requirements.txt
 python main.py
@@ -150,7 +150,7 @@ python main.py
 sudo apt update && sudo apt install -y python3 python3-pip python3-venv git
 
 # کلون و ورود به پوشه
-git clone https://github.com/icynetx/CyDrive.git
+git clone https://github.com/thecynetx/CyDrive.git
 cd CyDrive
 
 # روش اول (پیشنهادی و بدون تداخل با پکیج‌های دبیان):
@@ -381,6 +381,6 @@ CyDrive/
 ## 🌐 ارتباط با ما و تیم توسعه
 
 - **توسعه‌داده‌شده توسط:** [تیم امنیت سایبری ساینت (Cynet Security Team)](https://cynetx.ir)
-- **گیت‌هاب رسمی:** [@icynetx](https://github.com/icynetx)
-- **ریپازیتوری پروژه:** [https://github.com/icynetx/CyDrive](https://github.com/icynetx/CyDrive)
-- **پشتیبانی و ایمیل:** [heyfiranam@gmail.com](mailto:heyfiranam@gmail.com)
+- **گیت‌هاب رسمی:** [@thecynetx](https://github.com/thecynetx)
+- **ریپازیتوری پروژه:** [https://github.com/thecynetx/CyDrive](https://github.com/thecynetx/CyDrive)
+- **پشتیبانی و ایمیل:** [norahsfavi@gmail.com](mailto:norahsfavi@gmail.com)
