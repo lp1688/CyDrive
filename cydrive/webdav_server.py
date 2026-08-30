@@ -299,25 +299,38 @@ class PureVirtualTelegramProvider(DAVProvider):
 class CyWebDAVServer:
     """Manages the Pure Virtual WebDAV server engine."""
 
-    def __init__(self, root_path: str, host: str = "127.0.0.1", port: int = 8080, db: Optional[MetaDatabase] = None, cache_mgr: Optional[CacheManager] = None, telegram_engine=None):
+    def __init__(self, root_path: str, host: str = "127.0.0.1", port: int = 8080, db: Optional[MetaDatabase] = None, cache_mgr: Optional[CacheManager] = None, telegram_engine=None, username: Optional[str] = None, password: Optional[str] = None):
         self.root_path = os.path.abspath(root_path)
         self.host = host
         self.port = port
         self.db = db
         self.cache_mgr = cache_mgr or CacheManager()
         self.telegram_engine = telegram_engine
+        self.username = username
+        self.password = password
         self.server = None
         self._thread = None
         os.makedirs(self.root_path, exist_ok=True)
 
     def _create_app(self):
+        if self.username and self.password:
+            user_mapping = {"*": {self.username: {"password": self.password}}}
+        else:
+            # Anonymous fallback for standalone/test usage without configured credentials
+            user_mapping = {"*": True}
+
         config = {
             "host": self.host,
             "port": self.port,
             "provider_mapping": {
                 "/": PureVirtualTelegramProvider(self.db, self.cache_mgr, self.telegram_engine) if self.db else self.root_path
             },
-            "simple_dc": {"user_mapping": {"*": True}},
+            "simple_dc": {"user_mapping": user_mapping},
+            "http_authenticator": {
+                "accept_basic": True,
+                "accept_digest": True,
+                "default_to_digest": True
+            },
             "verbose": 1,
             "enable_cors": True,
             "dir_browser": {

@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 import string
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 try:
     import winreg
@@ -91,7 +91,7 @@ class WindowsMounter:
             return False, f"Registry error: {e}"
 
     @classmethod
-    def mount_drive(cls, drive_letter: str = "Y:", webdav_url: str = "http://127.0.0.1:8080") -> Tuple[bool, str]:
+    def mount_drive(cls, drive_letter: str = "Y:", webdav_url: str = "http://127.0.0.1:8080", username: Optional[str] = None, password: Optional[str] = None) -> Tuple[bool, str]:
         """Mounts WebDAV as a Windows network drive letter."""
         if not cls.is_windows():
             return False, "Not on Windows."
@@ -107,7 +107,10 @@ class WindowsMounter:
         cls.unmount_drive(drive_letter)
 
         # Run net use
-        cmd = ["net", "use", drive_letter, webdav_url, "/persistent:no"]
+        cmd = ["net", "use", drive_letter, webdav_url]
+        if username and password:
+            cmd += [f"/user:{username}", password]
+        cmd.append("/persistent:no")
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode == 0:
             return True, f"Successfully mounted CyDrive to {drive_letter}"

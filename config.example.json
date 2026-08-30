@@ -1,4 +1,6 @@
 {
     "bot_token": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
-    "chat_id": 123456789
+    "chat_id": 123456789,
+    "web_username": "admin",
+    "web_password": ""
 }

@@ -61,6 +61,8 @@ class CyDriveConfig:
     cache_limit_gb: int = 20
     encryption_password: Optional[str] = None
     enable_encryption: bool = False
+    web_username: str = "admin"
+    web_password: str = ""  # Auto-generated and saved on first run if empty
 
     @classmethod
     def load(cls, file_path: str = CONFIG_FILE, prompt_if_missing: bool = True) -> "CyDriveConfig":
@@ -148,3 +150,11 @@ class CyDriveConfig:
         # Ensure working directories exist
         os.makedirs(self.storage_path, exist_ok=True)
         os.makedirs(self.cache_path, exist_ok=True)
+
+    def ensure_web_password(self, file_path: str = CONFIG_FILE) -> str:
+        """Generates and persists a random Web UI / WebDAV password if not set."""
+        if not self.web_password:
+            import secrets
+            self.web_password = secrets.token_urlsafe(16)
+            self.save(file_path)
+        return self.web_password
