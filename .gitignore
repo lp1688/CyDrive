@@ -47,3 +47,7 @@ desktop.ini
 # Antigravity / Agents
 .agents/
 .gemini/
+
+# PyInstaller Build Output
+build/
+dist/

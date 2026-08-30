@@ -1,0 +1,72 @@
+name: Build Executables
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: Windows x64
+            artifact: CyDrive-Windows-x64.exe
+            bin: CyDrive.exe
+          - os: macos-latest
+            name: macOS (Apple Silicon)
+            artifact: CyDrive-macOS-arm64
+            bin: CyDrive
+          - os: ubuntu-latest
+            name: Linux x64
+            artifact: CyDrive-Linux-x64
+            bin: CyDrive
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt pyinstaller
+
+      - name: Build single-file executable
+        run: python -m PyInstaller cydrive.spec --clean --noconfirm
+
+      - name: Rename artifact
+        shell: bash
+        run: mv "dist/${{ matrix.bin }}" "dist/${{ matrix.artifact }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/${{ matrix.artifact }}
+
+  release:
+    name: Publish Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: artifacts
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" artifacts/* \
+            --title "CyDrive ${{ GITHUB_REF_NAME }}" \
+            --notes "Single-file executables for Windows, macOS, and Linux. No Python required — download, run, and follow the first-run wizard. macOS: if Gatekeeper blocks the binary, run \`xattr -d com.apple.quarantine CyDrive-macOS-arm64\` first."
