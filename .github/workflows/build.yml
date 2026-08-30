@@ -67,6 +67,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" artifacts/* \
-            --title "CyDrive ${{ GITHUB_REF_NAME }}" \
+          gh release create "$GITHUB_REF_NAME" artifacts/* \
+            --title "CyDrive $GITHUB_REF_NAME" \
             --notes "Single-file executables for Windows, macOS, and Linux. No Python required — download, run, and follow the first-run wizard. macOS: if Gatekeeper blocks the binary, run \`xattr -d com.apple.quarantine CyDrive-macOS-arm64\` first."
