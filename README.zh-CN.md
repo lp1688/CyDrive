@@ -507,5 +507,4 @@ CyDrive/
 
 - **开发者:** [Cynet Security Team](https://cynetx.ir)
 - **上游仓库:** [https://github.com/thecynetx/CyDrive](https://github.com/thecynetx/CyDrive)
-- **安全强化 Fork:** [https://github.com/lp1688/CyDrive](https://github.com/lp1688/CyDrive)
 - **技术支持:** [norahsfavi@gmail.com](mailto:norahsfavi@gmail.com)
