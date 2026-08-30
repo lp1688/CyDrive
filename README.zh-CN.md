@@ -384,6 +384,19 @@ python -m unittest discover tests
 
 ---
 
+## ⚠️ 三个容易踩的坑(代码逐行核实,均属实)
+
+1. **复制超过 50 MB 的文件会报错。**
+   Windows WebDAV 客户端(WebClient)出厂默认单文件上限为 50 MB(`FileSizeLimitInBytes`)。以**管理员身份**执行一次 `python main.py fix-reg` 即可把上限提升到 4 GB。注意:程序启动挂载时也会尝试自动优化注册表,但若终端没有管理员权限会静默失败,此时大文件传输仍需手动以管理员身份补跑。
+2. **`Y:` 磁盘显示的容量是错觉。**
+   容量条显示的是主磁盘(`C:`)的剩余空间——这是 Windows 文件资源管理器对本机网络磁盘的默认渲染行为,与实际云端用量无关。(CyDrive 的 WebDAV 层其实有回报 10 TB 虚拟配额,但 Windows WebClient 会忽略它。)
+3. **文件本体 100% 存在 Telegram 云端。**
+   上传完成后本机暂存会立即删除,实测传完 1 GB 视频前后 `C:` 剩余空间分毫不动。但有两个例外要记住:**传输进行中**文件会暂时占用本机缓存;且**上传失败时本机副本会被一并删除**(Zero-Disk 设计的代价)——重要文件请先确认 Telegram 已收到。
+
+**至于封号疑虑:** 本项目使用官方 Bot Token 与标准 Telethon(MTProto)客户端,代码对 FloodWait 速率限制有明确的自动等待处理(捕捉 `FloodWaitError` 后按秒数等待重试),账号风险确实很低。
+
+---
+
 ## ❓ 常见问题与故障排除(FAQs)
 
 <details>

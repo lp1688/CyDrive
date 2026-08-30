@@ -349,6 +349,19 @@ A common question users ask when mounting the network drive:
 
 ---
 
+## ⚠️ Three Common Pitfalls (Verified Line-by-Line Against the Code)
+
+1. **Copying files larger than 50 MB fails.**
+   The Windows WebDAV client (WebClient) ships with a 50 MB per-file factory limit (`FileSizeLimitInBytes`). Run `python main.py fix-reg` **once, as Administrator**, to raise it to 4 GB. Note: CyDrive also attempts this optimization automatically when mounting, but it fails silently without admin rights — re-run it manually from an elevated terminal if large transfers still fail.
+2. **The capacity shown on drive `Y:` is an illusion.**
+   The gauge actually reflects your host drive (`C:`) — that is simply how Windows Explorer renders local network drives, and it has nothing to do with real cloud usage. (CyDrive's WebDAV layer does report a virtual 10 TB quota, but the Windows WebClient ignores it.)
+3. **File payloads live 100% in the Telegram cloud.**
+   The local buffer is deleted immediately after a successful upload — copying a 1 GB video onto `Y:` leaves your `C:` free space completely untouched. Two caveats worth remembering: **during** the transfer the file does occupy the local cache, and a **failed** upload deletes the local copy too (the price of the Zero-Disk design) — confirm important files have arrived in Telegram before deleting the originals.
+
+**Worried about account bans?** The project uses an official Bot Token and the standard Telethon (MTProto) library, with explicit FloodWait rate-limit handling (it catches `FloodWaitError`, waits the mandated seconds, and retries) — the risk to your account is genuinely low.
+
+---
+
 ## ❓ Frequently Asked Questions & Troubleshooting
 
 <details>

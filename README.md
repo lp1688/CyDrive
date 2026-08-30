@@ -384,6 +384,19 @@ python -m unittest discover tests
 
 ---
 
+## ⚠️ 三個容易踩的坑(程式碼逐行核實,均屬實)
+
+1. **複製超過 50 MB 的檔案會報錯。**
+   Windows WebDAV 客戶端(WebClient)出廠預設單檔上限為 50 MB(`FileSizeLimitInBytes`)。以**系統管理員身分**執行一次 `python main.py fix-reg` 即可把上限提升到 4 GB。注意:程式啟動掛載時也會嘗試自動優化登錄檔,但若終端機沒有管理員權限會靜默失敗,此時大檔傳輸仍需手動以管理員身分補跑。
+2. **`Y:` 磁碟顯示的容量是錯覺。**
+   容量條顯示的是主磁碟(`C:`)的剩餘空間——這是 Windows 檔案總管對本機網路磁碟的預設渲染行為,與實際雲端用量無關。(CyDrive 的 WebDAV 層其實有回報 10 TB 虛擬配額,但 Windows WebClient 會忽略它。)
+3. **檔案本體 100% 存在 Telegram 雲端。**
+   上傳完成後本機暫存會立即刪除,實測傳完 1 GB 影片前後 `C:` 剩餘空間分毫不動。但有兩個例外要記住:**傳輸進行中**檔案會暫時佔用本機快取;且**上傳失敗時本機副本會被一併刪除**(Zero-Disk 設計的代價)——重要檔案請先確認 Telegram 已收到。
+
+**至於封號疑慮:** 本專案使用官方 Bot Token 與標準 Telethon(MTProto)客戶端,程式碼對 FloodWait 速率限制有明確的自動等待處理(`FloodWaitError` 捕捉後依秒數等待重試),帳號風險確實很低。
+
+---
+
 ## ❓ 常見問題與故障排除(FAQs)
 
 <details>
