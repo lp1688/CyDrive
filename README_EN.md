@@ -187,6 +187,57 @@ python3 main.py
 
 ---
 
+## ⚙️ Full Configuration Reference (`config.json`)
+
+In practice you only need to fill in `bot_token` and `chat_id`. Every other field is auto-populated with its default and saved on first run:
+
+```json
+{
+    "bot_token": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
+    "chat_id": 123456789,
+    "api_id": 6,
+    "api_hash": "eb06d4abfb49dc3eeb1aeb98ae0f581e",
+    "storage_path": "C:\\work\\CyDrive\\Telegram_Drive",
+    "cache_path": "C:\\work\\CyDrive\\Telegram_Cache",
+    "db_path": "C:\\work\\CyDrive\\cydrive_meta.db",
+    "webdav_host": "127.0.0.1",
+    "webdav_port": 8080,
+    "web_ui_host": "127.0.0.1",
+    "web_ui_port": 8088,
+    "enable_web_ui": true,
+    "drive_letter": "Y:",
+    "auto_mount_drive": true,
+    "chunk_size_mb": 1900,
+    "cache_limit_gb": 20,
+    "encryption_password": null,
+    "enable_encryption": false,
+    "web_username": "admin",
+    "web_password": ""
+}
+```
+
+| Field | Description |
+|---|---|
+| `bot_token` | Bot token issued by @BotFather (**required**) |
+| `chat_id` | Your numeric Telegram user ID (**required**) |
+| `api_id` / `api_hash` | Telegram client credentials — keep the defaults |
+| `storage_path` | Local staging directory (upload buffer) |
+| `cache_path` | Local LRU cache directory for cloud files |
+| `db_path` | Path of the SQLite metadata database |
+| `webdav_host` / `webdav_port` | WebDAV server bind address (use `127.0.0.1` for local use) |
+| `web_ui_host` / `web_ui_port` | Web Dashboard bind address |
+| `enable_web_ui` | Whether the Web Dashboard is enabled |
+| `drive_letter` | Windows drive letter to mount |
+| `auto_mount_drive` | Auto-mount the drive on startup |
+| `chunk_size_mb` | Chunk size in MB for large-file splitting (default 1900, below Telegram's 2 GB limit) |
+| `cache_limit_gb` | Local cache cap in GB — least-recently-used files are evicted beyond it |
+| `enable_encryption` / `encryption_password` | AES-256-GCM encryption toggle and password |
+| `web_username` / `web_password` | WebDAV / Web UI login credentials; **leave the password empty to auto-generate a random one on first run** |
+
+> ⚠️ `config.json` contains full credentials and is listed in `.gitignore` — never upload it anywhere public.
+
+---
+
 ## 🐧 3 Ways to Use CyDrive on Linux Servers (VPS / Ubuntu / Debian / CentOS)
 
 Linux does not use drive letters (like `Y:`). Instead, CyDrive delivers 3 flexible workflows:

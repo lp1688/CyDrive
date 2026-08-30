@@ -217,6 +217,57 @@ python3 main.py
 
 ---
 
+## ⚙️ 完整設定檔說明(`config.json`)
+
+實務上只需手動填寫 `bot_token` 與 `chat_id`,其餘欄位會在首次啟動時自動以預設值補齊並存檔:
+
+```json
+{
+    "bot_token": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
+    "chat_id": 123456789,
+    "api_id": 6,
+    "api_hash": "eb06d4abfb49dc3eeb1aeb98ae0f581e",
+    "storage_path": "C:\\work\\CyDrive\\Telegram_Drive",
+    "cache_path": "C:\\work\\CyDrive\\Telegram_Cache",
+    "db_path": "C:\\work\\CyDrive\\cydrive_meta.db",
+    "webdav_host": "127.0.0.1",
+    "webdav_port": 8080,
+    "web_ui_host": "127.0.0.1",
+    "web_ui_port": 8088,
+    "enable_web_ui": true,
+    "drive_letter": "Y:",
+    "auto_mount_drive": true,
+    "chunk_size_mb": 1900,
+    "cache_limit_gb": 20,
+    "encryption_password": null,
+    "enable_encryption": false,
+    "web_username": "admin",
+    "web_password": ""
+}
+```
+
+| 欄位 | 說明 |
+|---|---|
+| `bot_token` | @BotFather 發的機器人 Token(**必填**) |
+| `chat_id` | 你的 Telegram 數字 ID(**必填**) |
+| `api_id` / `api_hash` | Telegram 客戶端憑證,使用預設值即可 |
+| `storage_path` | 本機暫存目錄(上傳緩衝用) |
+| `cache_path` | 雲端檔案的本機 LRU 快取目錄 |
+| `db_path` | SQLite 元資料資料庫路徑 |
+| `webdav_host` / `webdav_port` | WebDAV 伺服器監聽位址(本機用 `127.0.0.1`) |
+| `web_ui_host` / `web_ui_port` | Web 面板監聽位址 |
+| `enable_web_ui` | 是否啟用 Web 面板 |
+| `drive_letter` | Windows 掛載的磁碟代號 |
+| `auto_mount_drive` | 啟動時是否自動掛載磁碟 |
+| `chunk_size_mb` | 大檔分割大小(MB),預設 1900(低於 Telegram 2 GB 上限) |
+| `cache_limit_gb` | 本機快取上限(GB),超過會自動淘汰最久未用的檔案 |
+| `enable_encryption` / `encryption_password` | AES-256-GCM 加密開關與密碼 |
+| `web_username` / `web_password` | WebDAV/Web 面板登入帳密;**留空會在首次啟動時自動產生隨機密碼** |
+
+> ⚠️ `config.json` 含有完整密鑰,已列入 `.gitignore`,請勿上傳到任何公開位置。
+
+---
+
 ## 🐧 Linux 伺服器上使用 CyDrive 的 3 種方式
 
 Linux 沒有「磁碟機代號」的概念,雲端硬碟有 3 種使用方式:
