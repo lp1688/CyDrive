@@ -463,3 +463,4 @@ This project is open-source software licensed under the **MIT License**. See [`L
 - **GitHub:** [@thecynetx](https://github.com/thecynetx)
 - **Repository:** [https://github.com/thecynetx/CyDrive](https://github.com/thecynetx/CyDrive)
 - **Email:** [norahsfavi@gmail.com](mailto:norahsfavi@gmail.com)
+- **Telegram Channel:** [t.me/cynetx](https://t.me/cynetx)
