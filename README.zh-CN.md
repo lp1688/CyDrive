@@ -173,6 +173,15 @@ flowchart TD
 1. 在 Telegram 进入 **[@userinfobot](https://t.me/userinfobot)**,按 **Start**。
 2. 它会回复一串数字 ID(例如 `123456789`),这就是你的 **Chat ID**。
    (若没有回复,可改用 `@getmyid_bot` 或 `@JsonDumpBot`,认明官方机器人,小心冒名假账号。)
+
+   **认明正确的官方机器人** —— 有蓝色验证勾勾、用户名为 `@userinfobot`;也可直接扫描 QR Code 前往:
+
+   <div align="center">
+
+   ![认明官方 @userinfobot:蓝色验证勾勾 + 用户名](./assets/userinfo-1.png)
+   ![扫码直达 @userinfobot](./assets/userinfo-QR.png)
+
+   </div>
 3. 最后,进入你刚创建的机器人对话,**按一次 Start**,机器人才有权限发消息给你。
 
 ### 第三步:下载项目并安装依赖

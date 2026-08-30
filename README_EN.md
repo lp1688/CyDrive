@@ -159,6 +159,15 @@ Setting up CyDrive takes under 5 minutes:
 ### Step 2: Get Your Chat ID
 1. Message **[@userinfobot](https://t.me/userinfobot)** and press **Start**.
 2. Note your numerical **Chat ID** (e.g. `123456789`).
+
+   **Make sure you found the genuine bot** — it carries a blue verification checkmark and the username `@userinfobot`. Beware of lookalike impostor accounts; you can also scan the QR code to go straight to it:
+
+   <div align="center">
+
+   ![The genuine @userinfobot: blue checkmark + username](./assets/userinfo-1.png)
+   ![Scan to open @userinfobot](./assets/userinfo-QR.png)
+
+   </div>
 3. Open your newly created bot chat and click **Start** so it has permission to message you.
 
 ### Step 3: Install & Launch
