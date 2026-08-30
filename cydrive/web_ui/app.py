@@ -20,12 +20,56 @@ class CyWebDashboard:
         self.db = db
         self.telegram_engine = telegram_engine
         if HAS_AIOHTTP:
-            self.app = web.Application()
+            middlewares = []
+            if getattr(self.config, "web_password", ""):
+                @web.middleware
+                async def basic_auth_middleware(request, handler):
+                    """Requires HTTP Basic authentication on all routes when a password is configured."""
+                    auth_header = request.headers.get("Authorization", "")
+                    if not self._check_basic_auth(auth_header):
+                        return web.Response(
+                            status=401,
+                            text="401 Unauthorized: CyDrive credentials required.",
+                            headers={"WWW-Authenticate": 'Basic realm="CyDrive", charset="UTF-8"'}
+                        )
+                    return await handler(request)
+                middlewares.append(basic_auth_middleware)
+            self.app = web.Application(middlewares=middlewares)
             self.runner = None
             self.site = None
             self._setup_routes()
         else:
             self.app = None
+
+    def _check_basic_auth(self, auth_header: str) -> bool:
+        import base64
+        import secrets
+        if not auth_header.startswith("Basic "):
+            return False
+        try:
+            decoded = base64.b64decode(auth_header[6:].strip(), validate=True).decode("utf-8")
+            username, _, password = decoded.partition(":")
+        except Exception:
+            return False
+        return (
+            secrets.compare_digest(username, self.config.web_username)
+            and secrets.compare_digest(password, self.config.web_password)
+        )
+
+    @staticmethod
+    def _sanitize_filename(filename: Optional[str]) -> Optional[str]:
+        """Rejects path traversal and strips directory components from a client-supplied filename."""
+        if not filename or not isinstance(filename, str):
+            return None
+        from urllib.parse import unquote
+        # Decode percent-encoding first so obfuscated traversal (%2e%2e%2f, ..%2F) is also caught
+        normalized = unquote(filename).replace("\\", "/")
+        if any(part == ".." for part in normalized.split("/")):
+            return None
+        name = normalized.rsplit("/", 1)[-1].strip()
+        if not name or name == ".":
+            return None
+        return name
 
     def _setup_routes(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -65,16 +109,15 @@ class CyWebDashboard:
     async def delete_handler(self, request):
         try:
             data = await request.json()
-            filename = data.get("filename")
+            filename = self._sanitize_filename(data.get("filename"))
             if not filename:
-                return web.json_response({"error": "No filename provided"}, status=400)
+                return web.json_response({"error": "Invalid filename"}, status=400)
             
-            clean_rel = "/" + filename.strip("/").replace("\\", "/")
+            clean_rel = f"/{filename}"
             self.db.delete_file(clean_rel)
-            self.db.delete_file(filename)
 
-            # Clean cache if any
-            local_path = os.path.join(self.config.cache_path, filename.lstrip("/\\"))
+            # Clean cache if any (filename is sanitized to a plain basename above)
+            local_path = os.path.join(self.config.cache_path, filename)
             if os.path.exists(local_path):
                 try:
                     os.remove(local_path)
@@ -89,9 +132,9 @@ class CyWebDashboard:
         reader = await request.multipart()
         field = await reader.next()
         if field.name == "file":
-            filename = field.filename
+            filename = self._sanitize_filename(field.filename)
             if not filename:
-                return web.json_response({"error": "No filename"}, status=400)
+                return web.json_response({"error": "Invalid filename"}, status=400)
             
             ext = os.path.splitext(filename)[1]
             temp_fd, temp_path = tempfile.mkstemp(prefix="cydrive_up_", suffix=ext)
@@ -131,11 +174,13 @@ class CyWebDashboard:
         return web.json_response({"error": "Invalid upload"}, status=400)
 
     async def download_handler(self, request):
-        filename = request.match_info.get("filename")
+        filename = self._sanitize_filename(request.match_info.get("filename"))
+        if not filename:
+            return web.json_response({"error": "Invalid filename"}, status=400)
         rel_path = f"/{filename}"
-        file_record = self.db.get_file(rel_path) or self.db.get_file(filename)
+        file_record = self.db.get_file(rel_path)
         
-        local_path = os.path.join(self.config.cache_path, filename.lstrip("/\\"))
+        local_path = os.path.join(self.config.cache_path, filename)
         
         # 1. If available in local cache/disk, stream directly
         if os.path.exists(local_path) and os.path.getsize(local_path) > 0:

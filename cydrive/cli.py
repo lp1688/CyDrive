@@ -75,6 +75,7 @@ class CyDriveCLI:
             table.add_row("WebDAV File Server", "🟢 Active", f"http://{webdav_ip}:{config.webdav_port}")
             table.add_row("Cyberpunk Web UI", "🟢 Online", f"http://{web_ui_ip}:{config.web_ui_port}")
             table.add_row("Windows Virtual Drive", "🔵 Mapped", f"Drive Letter: {config.drive_letter}")
+            table.add_row("Access Credentials", "🔑 Auth Required", f"User: {config.web_username} • Pass: {config.web_password}")
             table.add_row("Local Disk Footprint", "🟢 0 Bytes (Pure Cloud)", "Direct on-demand streaming from Telegram")
             table.add_row("Cloud Storage Used", "🟣 Synced", f"{stats['total_files']} Files ({size_mb:.2f} MB)")
 
@@ -83,6 +84,7 @@ class CyDriveCLI:
             print(f"[+] WebDAV Server: http://{webdav_ip}:{config.webdav_host}")
             print(f"[+] Web UI: http://{web_ui_ip}:{config.web_ui_port}")
             print(f"[+] Mounted Drive: {config.drive_letter}")
+            print(f"[+] Web Credentials: {config.web_username} / {config.web_password}")
             print(f"[+] Local Disk Footprint: 0 Bytes (Pure Cloud)")
             print(f"[+] Total Files: {stats['total_files']} ({size_mb:.2f} MB)")
 
@@ -107,7 +109,8 @@ class CyDriveCLI:
             return
 
         elif args.command == "mount":
-            success, msg = WindowsMounter.mount_drive(config.drive_letter, f"http://{config.webdav_host}:{config.webdav_port}")
+            config.ensure_web_password()
+            success, msg = WindowsMounter.mount_drive(config.drive_letter, f"http://{config.webdav_host}:{config.webdav_port}", config.web_username, config.web_password)
             print(f"[{'✅' if success else '❌'}] {msg}")
             return
 
@@ -123,7 +126,9 @@ class CyDriveCLI:
 
         # Main 'run' workflow
         print("\n⏳ Initializing CyDrive v2.0 Pure Virtual Cloud Services...\n")
-        
+
+        config.ensure_web_password()
+
         cache_mgr = CacheManager(config.cache_path, config.cache_limit_gb)
         telegram_engine = TelegramSyncEngine(config, db)
 
@@ -134,7 +139,9 @@ class CyDriveCLI:
             port=config.webdav_port,
             db=db,
             cache_mgr=cache_mgr,
-            telegram_engine=telegram_engine
+            telegram_engine=telegram_engine,
+            username=config.web_username,
+            password=config.web_password
         )
         webdav.start(blocking=False)
         
@@ -145,7 +152,7 @@ class CyDriveCLI:
             from cydrive.platform.linux_mac import UnixMounter
             if WindowsMounter.is_windows():
                 WindowsMounter.optimize_webdav_registry()
-                success, msg = WindowsMounter.mount_drive(config.drive_letter, f"http://{config.webdav_host}:{config.webdav_port}")
+                success, msg = WindowsMounter.mount_drive(config.drive_letter, f"http://{config.webdav_host}:{config.webdav_port}", config.web_username, config.web_password)
                 if success:
                     print(f"✅ Auto-Mounted {config.drive_letter} Virtual Drive in Windows Explorer")
             elif UnixMounter.is_linux() or UnixMounter.is_macos():
