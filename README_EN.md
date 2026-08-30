@@ -14,7 +14,7 @@
 [![Web Dashboard](https://img.shields.io/badge/Dashboard-Cyberpunk%20UI%20(8088)-00f3ff?style=for-the-badge)](http://127.0.0.1:8088)
 [![License: MIT](https://img.shields.io/badge/License-MIT-00ff88.svg?style=for-the-badge)](LICENSE)
 
-[📖 نسخه کامل فارسی (Persian)](README.md) • [Features](#-key-features) • [Setup Guide](#-0-to-100-step-by-step-setup-guide) • [Web Dashboard](#-cyberpunk-web-dashboard) • [How It Works](#-under-the-hood-how-it-works) • [Testing](#-automated-test-suite) • [FAQ](#-frequently-asked-questions--troubleshooting)
+[📖 نسخه کامل فارسی (Persian)](README.fa.md) • [📖 繁體中文](README.md) • [📖 简体中文](README.zh-CN.md) • [Features](#-key-features) • [Security Audit](#️-security-audit--fixes-this-fork) • [Setup Guide](#-0-to-100-step-by-step-setup-guide) • [Web Dashboard](#-cyberpunk-web-dashboard) • [How It Works](#-under-the-hood-how-it-works) • [Testing](#-automated-test-suite) • [FAQ](#-frequently-asked-questions--troubleshooting)
 
 </div>
 
@@ -68,6 +68,48 @@ Drag a multi-gigabyte project folder into `Y:` in Windows Explorer; CyDrive inde
   Encrypt files client-side before they ever touch the network with authenticated Galois/Counter Mode cryptography.
 - 🤖 **Interactive Telegram Remote Bot:**  
   Query storage statistics (`/stats`), search files (`/search <name>`), or download any file straight to your phone (`/get <name>`).
+
+---
+
+## 🛡️ Security Audit & Fixes (This Fork)
+
+> This fork ([lp1688/CyDrive](https://github.com/lp1688/CyDrive)) includes a full line-by-line security audit of upstream v2.0 and fixes for the vulnerabilities found.
+
+### Audit Verdict: No Trojan or Backdoor Found
+
+- All ~2,300 lines of Python source plus the Web Dashboard JS/CSS/HTML were manually reviewed: **no obfuscated code, no hidden data-exfiltration channel, no suspicious `eval`/`exec`/`pickle` usage**.
+- Outbound network activity is limited to two legitimate kinds:
+  - Telegram MTProto (the core feature, via Telethon)
+  - Local public-IP lookup (`api.ipify.org` etc., only used to display the URL when binding to `0.0.0.0`)
+- Every subprocess call (`sc`, `net use`, `mount`, ...) is a hardcoded command — no command-injection surface.
+
+### Vulnerabilities Fixed
+
+**1. WebDAV & Web Dashboard Had No Authentication (High Risk)**
+
+Upstream `webdav_server.py` allowed anonymous access with `{"*": True}`. Once bound to `0.0.0.0` (e.g. on a VPS), anyone reaching ports 8080/8088 could read, upload, and delete your entire cloud drive.
+
+**Fix:**
+- New `web_username` / `web_password` config fields; a random password is auto-generated and saved to `config.json` on first run
+- WebDAV server now enforces HTTP Basic + Digest authentication
+- All Web Dashboard routes (including static files) are protected by a Basic Auth middleware using `secrets.compare_digest` (timing-attack safe)
+- Windows `net use` mounting automatically supplies the credentials
+
+**2. Path Traversal in Web UI**
+
+Upstream `/api/delete`, `/api/upload`, and `/api/download` concatenated user-supplied filenames directly into filesystem paths — `../../` could escape the cache directory to delete or overwrite arbitrary files.
+
+**Fix:**
+- New `_sanitize_filename()`: URL-decodes first (catching obfuscated forms like `..%2F` and `%2e%2e%2f`), rejects any `..` path segment, and keeps only a plain basename; invalid names return HTTP 400
+- Automated tests added (unauthenticated access + three traversal attack vectors)
+
+### Residual Risks to Be Aware Of
+
+- ⚠️ **Failed uploads still delete the local cache file** (Zero-Disk design in `telegram_client.py`): if the network drops mid-upload, the local copy is gone too. Verify important files exist in Telegram before deleting originals.
+- ⚠️ `fix-reg` sets the WebClient registry value `BasicAuthLevel=2` (allows Basic auth over plaintext HTTP) and raises the file-size limit to 4 GB — it requires admin rights and intentionally weakens a Windows default.
+- ⚠️ The app embeds the public `api_id`/`api_hash` of Telegram's official Android client (common practice in open-source Telethon projects), which technically violates Telegram ToS.
+- ⚠️ If you bind to `0.0.0.0` on a VPS, Basic Auth credentials travel over plaintext HTTP — **put an HTTPS reverse proxy (Caddy / Nginx) in front**.
+- ⚠️ The Bot Token grants full control of your bot. If it leaks, revoke it immediately via @BotFather (`/revoke`) and update `config.json`.
 
 ---
 
@@ -317,8 +359,10 @@ CyDrive/
 ├── config.example.json         # Example configuration
 ├── .gitignore                  # Git ignore rules
 ├── LICENSE                     # MIT Open-Source License
-├── README.md                   # Full Persian Documentation
-└── README_EN.md                # Full English Documentation
+├── README.fa.md                # Full Persian Documentation (original upstream language)
+├── README_EN.md                # Full English Documentation (this file)
+├── README.md                   # Full Traditional Chinese Documentation (繁體中文)
+└── README.zh-CN.md             # Full Simplified Chinese Documentation (简体中文)
 ```
 
 ---
