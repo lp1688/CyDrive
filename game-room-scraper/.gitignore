@@ -3,6 +3,9 @@ config.json
 *.db
 *.sqlite
 *.sqlite3
+data/*.json
+data/*.db
+!data/.gitkeep
 __pycache__/
 *.py[cod]
 .pytest_cache/
