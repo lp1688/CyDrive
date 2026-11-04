@@ -1,0 +1,17 @@
+.env
+config.json
+*.db
+*.sqlite
+*.sqlite3
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.env.local
+playwright-report/
+test-results/
+.auth/
+storage_state.json
+*.log
+.DS_Store

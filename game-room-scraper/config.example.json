@@ -1,0 +1,36 @@
+{
+  "base_url": "https://example.com",
+  "login_url": "https://example.com/login",
+  "machine_list_url": "https://example.com/machines",
+  "username": "your_username",
+  "password": "your_password",
+  "headless": true,
+  "timeout_ms": 30000,
+  "db_path": "./data/machines.db",
+  "fetch_details": true,
+  "selectors": {
+    "username_input": "input[name='username']",
+    "password_input": "input[name='password']",
+    "login_button": "button[type='submit']",
+    "machine_card": "[data-machine-id], .machine-card",
+    "machine_id": ".machine-id",
+    "machine_percent": ".machine-percent",
+    "occupied_icon": ".occupied, .user-icon",
+    "locked_icon": ".locked, .lock-icon",
+    "detail_panel": ".machine-detail",
+    "detail_today_bet": ".today-bet",
+    "detail_today_rate": ".today-rate",
+    "detail_days30_bet": ".days30-bet",
+    "detail_days30_rate": ".days30-rate",
+    "detail_spins_since_win": ".spins-since-win",
+    "detail_prev1_spins": ".prev1-spins",
+    "detail_prev2_spins": ".prev2-spins",
+    "next_page": ".pagination .next, button[aria-label='next']",
+    "show_all_filter": "button:has-text('顯示全部')"
+  },
+  "api_intercept": {
+    "enabled": true,
+    "url_substring": "/api/machines",
+    "comment": "If the list loads via XHR, prefer parsing that JSON over DOM scraping. Update url_substring after inspecting Network tab."
+  }
+}
